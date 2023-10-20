@@ -117,11 +117,11 @@ bool Renderer::InitialiseGeometry()
 		/*
 			Create UV COORDS Buffer Object (VBO) to hold normals positions
 		*/
-		GLuint texcoordsVBO;
+		/*GLuint texcoordsVBO;
 		glGenBuffers(1, &texcoordsVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * mesh.uvCoords.size(), mesh.uvCoords.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
 
 		GLuint elementsEBO; 
@@ -161,16 +161,16 @@ bool Renderer::InitialiseGeometry()
 		);
 
 		// SET UV COORDS ATTRIBUTE
-		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(
-			2,                  // attribute 0
-			2,                  // size in bytes of each item in the stream
-			GL_FLOAT,           // type of the item
-			GL_FALSE,           // normalized or not (advanced)
-			0,                  // stride (advanced)
-			(void*)0            // array buffer offset (advanced)
-		);
+		//glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
+		//glEnableVertexAttribArray(2);
+		//glVertexAttribPointer(
+		//	2,                  // attribute 0
+		//	2,                  // size in bytes of each item in the stream
+		//	GL_FLOAT,           // type of the item
+		//	GL_FALSE,           // normalized or not (advanced)
+		//	0,                  // stride (advanced)
+		//	(void*)0            // array buffer offset (advanced)
+		//);
 		// Elements - Element array buffer is special!
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
 		// Clear VAO binding;
@@ -254,10 +254,6 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	//glUniform1i(glGetUniformLocation(m_program, "ourTexture"), 0);
 
 	// TODO: render each mesh. Send the correct model matrix to the shader in a uniform
-	for (const MeshStruct mesh : m_meshVector)
-	{
-	}
-
 	for (const MeshStruct mesh : m_meshVector)
 	{
 		glBindVertexArray(mesh.VAO);
