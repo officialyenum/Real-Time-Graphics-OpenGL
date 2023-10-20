@@ -1,14 +1,15 @@
 #version 330
 
+uniform vec4 diffuse_colour;
+
+in vec3 varying_normals;
+in vec2 varying_texcoords;
+
+
 out vec4 fragment_colour;
-
-in vec4 vertexColor;
-in vec2 texCoord;
-
-uniform sampler2D ourTexture;
 
 void main(void)
 {
-	fragment_colour = texture(ourTexture, texCoord);
-	//fragment_colour = vec4(1.0,1.0,0.0,1.0);
+	vec3 N = (varying_normals + 0.5);
+	fragment_colour = vec4(N, 1.0);
 }

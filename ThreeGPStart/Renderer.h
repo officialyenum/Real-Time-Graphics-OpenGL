@@ -25,9 +25,11 @@ private:
 	// Number of elments to use when rendering
 	GLuint m_numElements{ 0 };
 
-	GLuint m_tex{ 0 };
+	GLuint fxaa_fbo_{ 0 };
+	GLuint fxaa_tex_{ 0 };
 
 	bool m_wireframe{ false };
+	bool m_cullFace{ true };
 
 	std::vector<MeshStruct> m_meshVector;
 
