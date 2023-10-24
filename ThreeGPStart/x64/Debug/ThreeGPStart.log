@@ -1,3 +1,4 @@
 ﻿  Renderer.cpp
-C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(96,42): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(94,37): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(91,14): warning C4101: 'mymesh': unreferenced local variable
   ThreeGPStart.vcxproj -> C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\x64\Debug\GraphicsFramework.exe

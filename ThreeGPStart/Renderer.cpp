@@ -76,27 +76,28 @@ bool Renderer::InitialiseGeometry()
 	// Helpers has an object for loading 3D geometry, supports most types
 	
 	// Load in the jeep
-	Helpers::ModelLoader loader;
-	Helpers::ImageLoader imageLoader;
-
-	
+	Helpers::ModelLoader loader;	
 	if (!loader.LoadFromFile("Data\\Models\\Jeep\\jeep.obj"))
 		return false;
 
 	// Todo: Load Image Texture
-	if (!imageLoader.Load("Data\\Models\\Jeep\\jeep_army.jpg"))
+	Helpers::ImageLoader imageLoader;
+	if (!imageLoader.Load("Data\\Textures\\jeep_rood.jpg"))
 		return false;
-
+	
 	// Now we can loop through all the mesh in the loaded model:
 	for (const Helpers::Mesh& mesh : loader.GetMeshVector())
 	{
 		MeshStruct mymesh;
 		std::cout << mesh.name << " + MatIndex: " << mesh.materialIndex << "\n";
 
-		mymesh.numElements = mesh.elements.size();
+		m_numElements = mesh.elements.size();
+		// m_tex = mesh.uvCoords.size();
 		/*
 			Create Vertex Buffer Object (VBO) to hold vertex positions
 		*/
+
+
 
 		GLuint positionsVBO;
 		glGenBuffers(1, &positionsVBO);
@@ -117,13 +118,7 @@ bool Renderer::InitialiseGeometry()
 		/*
 			Create UV COORDS Buffer Object (VBO) to hold normals positions
 		*/
-		/*GLuint texcoordsVBO;
-		glGenBuffers(1, &texcoordsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * mesh.uvCoords.size(), mesh.uvCoords.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-
-
+		
 		GLuint elementsEBO; 
 		glGenBuffers(1, &elementsEBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
@@ -131,11 +126,16 @@ bool Renderer::InitialiseGeometry()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
+		GLuint texcoordsVBO;
+		glGenBuffers(1, &texcoordsVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * mesh.uvCoords.size(), mesh.uvCoords.data(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		// TODO: create a VBA to wrap everything and specify locations in the shaders
 
 		// Create a unique id for a vertex array object(VAO)
-		glGenVertexArrays(1, &mymesh.VAO);
-		glBindVertexArray(mymesh.VAO);
+		glGenVertexArrays(1, &m_VAO);
+		glBindVertexArray(m_VAO);
 
 		// SET POSITION ATTRIBUTE
 		glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
@@ -161,48 +161,44 @@ bool Renderer::InitialiseGeometry()
 		);
 
 		// SET UV COORDS ATTRIBUTE
-		//glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-		//glEnableVertexAttribArray(2);
-		//glVertexAttribPointer(
-		//	2,                  // attribute 0
-		//	2,                  // size in bytes of each item in the stream
-		//	GL_FLOAT,           // type of the item
-		//	GL_FALSE,           // normalized or not (advanced)
-		//	0,                  // stride (advanced)
-		//	(void*)0            // array buffer offset (advanced)
-		//);
+		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(
+			2,                  // attribute 0
+			2,                  // size in bytes of each item in the stream
+			GL_FLOAT,           // type of the item
+			GL_FALSE,           // normalized or not (advanced)
+			0,                  // stride (advanced)
+			(void*)0            // array buffer offset (advanced)
+		);
 		// Elements - Element array buffer is special!
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
+
+
 		// Clear VAO binding;
 		glBindVertexArray(0);
 
-
-
-		m_meshVector.push_back(mymesh);
+		//m_meshVector.push_back(mymesh);
 	}
+	Helpers::CheckForGLError();
 
 	GLint viewportSize[4];
 	glGetIntegerv(GL_VIEWPORT, viewportSize);
 
 
 	//FXAA Framebuffer + Texture
-	glGenFramebuffers(1, &fxaa_fbo_);
-	glGenTextures(1, &fxaa_tex_);
+	glGenFramebuffers(1, &m_tex);
+	glGenTextures(1, &m_tex);
+	glBindTexture(GL_TEXTURE_2D, m_tex);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glBindTexture(GL_TEXTURE_2D, fxaa_tex_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, imageLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	// FXAA BUFFER
-	glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fxaa_tex_, 0);
-	GLenum bufs4[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs4);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
-	
 	return true;
 }
 
@@ -247,22 +243,20 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	glUniformMatrix4fv(model_xform_id, 1, GL_FALSE, glm::value_ptr(model_xform));
 
 
-	//glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
-
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, m_meshVector.fxaa_tex_);
-	//glUniform1i(glGetUniformLocation(m_program, "ourTexture"), 0);
+	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
+	glBindTexture(GL_TEXTURE_2D, m_tex);
+	glUniform1i(glGetUniformLocation(m_program, "ourTexture"), 0);
 
 	// TODO: render each mesh. Send the correct model matrix to the shader in a uniform
-	for (const MeshStruct mesh : m_meshVector)
+	/*for (const MeshStruct mesh : m_meshVector)
 	{
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numElements, GL_UNSIGNED_INT, (void*)0);
-	}
+	}*/
 
 
-	//glBindVertexArray(m_VAO);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(m_VAO);
+	glDrawElements(GL_TRIANGLES, m_numElements, GL_UNSIGNED_INT, (void*)0);
 	// Always a good idea, when debugging at least, to check for GL errors each frame
 	Helpers::CheckForGLError();
 }
