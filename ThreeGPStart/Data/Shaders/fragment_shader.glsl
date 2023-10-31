@@ -20,7 +20,7 @@ void main(void)
 	vec3 red_col = vec3(1.0, 1.0, 0.0);
 
 	vec3 tex_colour = texture(ourTexture, TexCoord).rgb;
-	float ambientStrength = 0.1;
+	float ambientStrength = 0.4;
 	vec3 ambient = ambientStrength * ambient_col;
 
 	vec3 norm = normalize(varying_normals);
@@ -32,7 +32,7 @@ void main(void)
 	vec3 result = (ambient + diffuse) * red_col;
 	fragment_colour = texture(ourTexture, TexCoord) * vec4(result, 1.0);
 	//fragment_colour = vec4(result, 1.0);
-	//fragment_colour = vec4(tex_colour, 1);
+	//fragment_colour = vec4(tex_colour, 1.0);
 
 	//(texture(ourTexture, TexCoord).rgb, 1.0);
 }

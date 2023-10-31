@@ -119,6 +119,13 @@ bool Renderer::InitialiseGeometry()
 			Create UV COORDS Buffer Object (VBO) to hold normals positions
 		*/
 		
+
+		GLuint texcoordsVBO;
+		glGenBuffers(1, &texcoordsVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * mesh.uvCoords.size(), mesh.uvCoords.data(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 		GLuint elementsEBO; 
 		glGenBuffers(1, &elementsEBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
@@ -126,11 +133,7 @@ bool Renderer::InitialiseGeometry()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
-		GLuint texcoordsVBO;
-		glGenBuffers(1, &texcoordsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * mesh.uvCoords.size(), mesh.uvCoords.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 		// TODO: create a VBA to wrap everything and specify locations in the shaders
 
 		// Create a unique id for a vertex array object(VAO)
@@ -187,7 +190,7 @@ bool Renderer::InitialiseGeometry()
 
 
 	//FXAA Framebuffer + Texture
-	glGenFramebuffers(1, &m_tex);
+	//glGenFramebuffers(1, &m_tex);
 	glGenTextures(1, &m_tex);
 	glBindTexture(GL_TEXTURE_2D, m_tex);
 
@@ -196,7 +199,7 @@ bool Renderer::InitialiseGeometry()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, imageLoader.GetData());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	return true;
