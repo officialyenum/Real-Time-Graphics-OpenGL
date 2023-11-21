@@ -1,4 +1,5 @@
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Camera.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\Camera.obj
+C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\EBO.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\EBO.obj
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\External\GLEW\glew.c;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\glew.obj
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\External\IMGUI\imgui.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\imgui.obj
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\External\IMGUI\imgui_draw.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\imgui_draw.obj
@@ -11,3 +12,5 @@ C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\main.cpp;
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Mesh.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\Mesh.obj
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\Renderer.obj
 C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Simulation.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\Simulation.obj
+C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\VAO.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\VAO.obj
+C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\VBO.cpp;C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\x64\Debug\VBO.obj

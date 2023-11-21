@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EBO.h" />
     <ClInclude Include="ExternalLibraryHeaders.h" />
     <ClInclude Include="External\IMGUI\imconfig.h" />
     <ClInclude Include="External\IMGUI\imgui.h" />
@@ -109,9 +110,12 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="ThreeGPStart.h" />
+    <ClInclude Include="VAO.h" />
+    <ClInclude Include="VBO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EBO.cpp" />
     <ClCompile Include="External\GLEW\glew.c" />
     <ClCompile Include="External\IMGUI\imgui.cpp" />
     <ClCompile Include="External\IMGUI\imgui_draw.cpp" />
@@ -124,6 +128,8 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="VAO.cpp" />
+    <ClCompile Include="VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="External\IMGUI\imgui.natvis" />

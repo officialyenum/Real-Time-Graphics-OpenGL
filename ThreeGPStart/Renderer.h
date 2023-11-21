@@ -5,6 +5,14 @@
 #include "Helper.h"
 #include "Mesh.h"
 #include "Camera.h"
+#include "VBO.h"
+#include "EBO.h"
+#include "VAO.h"
+
+struct Model
+{
+	std::vector<Helpers::Mesh> mesh;
+};
 
 struct MeshStruct
 {
@@ -16,6 +24,7 @@ struct MeshStruct
 class Renderer
 {
 private:
+	std::vector<Model> m_models;
 	// Program object - to host shaders
 	GLuint m_program{ 0 };
 
@@ -39,6 +48,8 @@ public:
 
 	// Create the program. This is the compiled shaders.
 	bool CreateProgram();
+
+	void CreateTerrain(int size);
 
 	// Create and / or load geometry, this is like 'level load'
 	bool InitialiseGeometry();

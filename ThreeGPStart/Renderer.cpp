@@ -66,13 +66,61 @@ bool Renderer::CreateProgram()
 	return !Helpers::CheckForGLError();
 }
 
+void Renderer::CreateTerrain(int size)
+{
+	int numCellsX{ 16 };
+	int numCellsZ{ 16 };
+	
+	int numVertsX = numCellsX + 1;
+	int numVertsZ = numCellsZ + 1;
+
+	int numTrisX = numCellsX * 2;
+	int numTrisZ = numCellsZ * 2;
+
+	float cellSizeX = size / (float)numCellsX;
+	float cellSizeZ = size / (float)numCellsZ;
+
+	glm::vec3 startPos{ -size / 2.0f, 0, size / 2.0f};
+	//Vertices
+	std::vector<glm::vec3> vertices;
+
+	for (int z = 0; z < numVertsZ; z++)
+	{
+		for (int x = 0; x < numVertsX; x++)
+		{
+
+			glm::vec3 pos{startPos};
+			pos.x += cellSizeX * x;
+			pos.z += cellSizeX * z;
+		}
+	}
+	//Elementa
+	std::vector<GLuint> elements;
+
+	for (int z = 0; z < numCellsZ; z++)
+	{
+		for (int x = 0; x < numCellsX; x++)
+		{
+			//Triangle 1
+			int startVertex = z * numVertsX + x;
+			elements.push_back(startVertex);
+			elements.push_back(startVertex + 1);
+			elements.push_back(startVertex + 1 + numVertsX);
+
+			//Triangle 2
+			elements.push_back(startVertex);
+			elements.push_back(startVertex + 1);
+			elements.push_back(startVertex + numVertsX);
+		}
+	}
+}
+
 // Load / create geometry into OpenGL buffers	
 bool Renderer::InitialiseGeometry()
 {
 	// Load and compile shaders into m_program
 	if (!CreateProgram())
 		return false;
-
 	// Helpers has an object for loading 3D geometry, supports most types
 	
 	// Load in the jeep
@@ -84,7 +132,7 @@ bool Renderer::InitialiseGeometry()
 	Helpers::ImageLoader imageLoader;
 	if (!imageLoader.Load("Data\\Textures\\jeep_rood.jpg"))
 		return false;
-	
+
 	// Now we can loop through all the mesh in the loaded model:
 	for (const Helpers::Mesh& mesh : loader.GetMeshVector())
 	{
@@ -98,13 +146,16 @@ bool Renderer::InitialiseGeometry()
 		*/
 
 
+		/*VBO positionsVBO(mesh.vertices.data(), sizeof(glm::vec3) * mesh.vertices.size());
+		VBO normalsVB0(mesh.vertices.data(), sizeof(glm::vec3) * mesh.vertices.size());
+		VBO texcoordsVBO(mesh.vertices.data(), sizeof(glm::vec2) * mesh.uvCoords.size());
+		EBO elementsEBO(mesh.elements.data(), sizeof(GLuint) * mesh.elements.size());*/
 
 		GLuint positionsVBO;
 		glGenBuffers(1, &positionsVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * mesh.vertices.size(), mesh.vertices.data(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
 		//TODO: Create another buffer, and send to normals
 		/*
 			Create Normals Buffer Object (VBO) to hold normals positions
@@ -119,7 +170,6 @@ bool Renderer::InitialiseGeometry()
 			Create UV COORDS Buffer Object (VBO) to hold normals positions
 		*/
 		
-
 		GLuint texcoordsVBO;
 		glGenBuffers(1, &texcoordsVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
@@ -192,6 +242,7 @@ bool Renderer::InitialiseGeometry()
 	//FXAA Framebuffer + Texture
 	//glGenFramebuffers(1, &m_tex);
 	glGenTextures(1, &m_tex);
+	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
 	glBindTexture(GL_TEXTURE_2D, m_tex);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -199,8 +250,12 @@ bool Renderer::InitialiseGeometry()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
+
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
+
 
 	return true;
 }
@@ -238,8 +293,6 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	GLuint combined_xform_id = glGetUniformLocation(m_program, "combined_xform");
 	glUniformMatrix4fv(combined_xform_id, 1, GL_FALSE, glm::value_ptr(combined_xform));
 
-
-
 	glm::mat4 model_xform = glm::mat4(1);
 
 	GLuint model_xform_id = glGetUniformLocation(m_program, "model_xform");
@@ -261,6 +314,8 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLES, m_numElements, GL_UNSIGNED_INT, (void*)0);
 	// Always a good idea, when debugging at least, to check for GL errors each frame
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 	Helpers::CheckForGLError();
 }
 
