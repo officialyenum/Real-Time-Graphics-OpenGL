@@ -1,0 +1,1 @@
+You will need to link the includes and libs in the OpenGL_Includes&Libs folder to the project. 
