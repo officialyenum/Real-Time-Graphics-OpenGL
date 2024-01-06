@@ -127,6 +127,10 @@
   <ItemGroup>
     <None Include="Data\Shaders\fragment_shader.frag" />
     <None Include="Data\Shaders\vertex_shader.vert" />
+    <None Include="Shaders\core_fragment_shader.frag" />
+    <None Include="Shaders\core_vertex_shader.vert" />
+    <None Include="Shaders\terrain_fragment_shader.frag" />
+    <None Include="Shaders\terrain_vertex_shader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="External\IMGUI\imgui.natvis" />
