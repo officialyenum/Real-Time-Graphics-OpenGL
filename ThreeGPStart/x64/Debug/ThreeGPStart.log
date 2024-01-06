@@ -1,19 +1,17 @@
 ﻿  Camera.cpp
-  imgui.cpp
-  imgui_draw.cpp
-  imgui_impl_glfw.cpp
-  imgui_impl_opengl3.cpp
-  imgui_tables.cpp
-  imgui_widgets.cpp
   Helper.cpp
   ImageLoader.cpp
   main.cpp
   Mesh.cpp
   Renderer.cpp
-C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(104,23): warning C4018: '<': signed/unsigned mismatch
-C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(106,24): warning C4018: '<': signed/unsigned mismatch
-C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(219,44): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(74,9): error C2374: 'vertex_shader': redefinition; multiple initialization
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(47,9): message : see declaration of 'vertex_shader'
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(75,9): error C2374: 'fragment_shader': redefinition; multiple initialization
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(48,9): message : see declaration of 'fragment_shader'
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(133,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(135,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(270,44): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+  Shader.cpp
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Shader.h(20,1): error C2143: syntax error: missing ';' before '}'
   Simulation.cpp
   Generating Code...
-  glew.c
-  ThreeGPStart.vcxproj -> C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\x64\Debug\ThreeGPStart.exe

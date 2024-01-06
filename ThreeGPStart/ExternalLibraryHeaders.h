@@ -25,6 +25,7 @@
 
 // Common C++ files used all over
 #include <string>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>

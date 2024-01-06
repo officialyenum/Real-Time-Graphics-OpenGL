@@ -68,6 +68,9 @@
     <ClInclude Include="External\IMGUI\imstb_truetype.h">
       <Filter>External</Filter>
     </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -112,14 +115,11 @@
     <ClCompile Include="External\IMGUI\imgui_widgets.cpp">
       <Filter>External</Filter>
     </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shaders\vertex_shader.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Data\Shaders\fragment_shader.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\core_fragment_shader.frag">
       <Filter>Shaders</Filter>
     </None>

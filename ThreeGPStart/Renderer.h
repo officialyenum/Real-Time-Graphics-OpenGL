@@ -33,7 +33,7 @@ private:
 	// Program object - to host core shaders
 	GLuint m_program{ 0 };
 	// Program object - to host light shaders
-	GLuint l_program{ 0 };
+	GLuint terrain_program{ 0 };
 
 	// Vertex Array Object to wrap all render settings
 	GLuint m_terrain_VAO{ 0 };
@@ -45,6 +45,7 @@ private:
 
 	GLuint fxaa_fbo_{ 0 };
 	GLuint fxaa_tex_{ 0 };
+	GLuint terrain_tex_{ 0 };
 
 	bool m_wireframe{ false };
 	bool m_cullFace{ true };	
@@ -65,6 +66,8 @@ public:
 
 	// Create and / or load geometry, this is like 'level load'
 	bool InitialiseGeometry();
+
+	GLuint DrawImage(GLuint textureID, const char* filename);
 
 	// Render the scene
 	void Render(const Helpers::Camera& camera, float deltaTime);

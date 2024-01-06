@@ -106,6 +106,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="RedirectStandardOutput.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="Simulation.h" />
   </ItemGroup>
   <ItemGroup>
@@ -122,11 +123,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shaders\fragment_shader.frag" />
-    <None Include="Data\Shaders\vertex_shader.vert" />
     <None Include="Shaders\core_fragment_shader.frag" />
     <None Include="Shaders\core_vertex_shader.vert" />
     <None Include="Shaders\terrain_fragment_shader.frag" />
