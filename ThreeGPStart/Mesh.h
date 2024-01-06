@@ -4,15 +4,14 @@
 #include "ExternalLibraryHeaders.h"
 #include "Helper.h"
 
-// Per node animation data
-struct AnimationData
-{
-	float time;
-	glm::vec3 value;
-};
-
 namespace Helpers
 {
+	// Per node animation data
+	struct AnimationData
+	{
+		float time;
+		glm::vec3 value;
+	};
 
 	// Materials work with lights and shaders to produce the final render
 	struct Material
@@ -66,9 +65,9 @@ namespace Helpers
 		std::vector<unsigned int> elements;
 
 		// Index into the material vector held by the ModelLoader
-		size_t materialIndex;
+		size_t materialIndex{ 0 };
 
-		// Retrieve the dimensions of this mesh in local coordinates
+		// Retrieve the dimensions of this mesh in local model coordinates
 		void GetLocalExtents(glm::vec3& minExtents, glm::vec3& maxExtents) const;
 
 		// Helper
@@ -88,7 +87,7 @@ namespace Helpers
 	struct Node
 	{
 		std::string name;
-		glm::mat4 transform;
+		glm::mat4 transform{ 1 };
 		std::vector<unsigned int> meshIndices;
 
 		Node* parentNode{ nullptr };
@@ -128,7 +127,7 @@ namespace Helpers
 		std::vector<Mesh>& GetMeshVector() { return m_meshVector; }
 
 		// Retrieves the collection of materials loaded from the 3D model
-		std::vector<Material>& GetMaterialVector() { return m_materials; }
+		const std::vector<Material>& GetMaterialVector() const { return m_materials; }
 
 		// For a mesh heirarchy this is the root.
 		Node* GetRootNode() { return m_rootNode; }
@@ -138,7 +137,7 @@ namespace Helpers
 			return RecurseFindNode(m_rootNode, nodeName);
 		}
 
-		// Retrieve the dimensions of this model in local coordinates
+		// Retrieve the dimensions of this model in local model coordinates
 		void GetLocalExtents(glm::vec3& minExtents, glm::vec3& maxExtents) const;
 
 		// Helper to output the main info. of this loaded model

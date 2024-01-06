@@ -7,11 +7,12 @@
 
 namespace Helpers
 {
+	// Conversions from ASSIMP types
 	inline glm::vec4 aiColor4DToGlmVec4(aiColor4D col) { return glm::vec4(col.r, col.g, col.b, col.a); }
 	inline std::string aiStringToString(const aiString& str) { return std::string(str.C_Str()); }
 	inline glm::vec3 aiVector3DToGlmVec3(aiVector3D vec) { return glm::vec3(vec.x, vec.y, vec.z); }
 
-	// OpenGL uses column major matrices will ASSIMP uses row major - this converts
+	// OpenGL uses column major matrices while ASSIMP uses row major - this converts
 	inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from)
 	{
 		glm::mat4 to;

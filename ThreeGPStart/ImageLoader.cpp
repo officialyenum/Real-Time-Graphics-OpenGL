@@ -1,39 +1,44 @@
 #include "ImageLoader.h"
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace Helpers
 {
-
-	GLubyte ImageLoader::GetGreyValue(float u, float v) const
+	BYTE ImageLoader::GetGreyValue(float u, float v) const
 	{
-		// Nearest
-		int x = (int)(u * m_width);
-		int y = (int)(v * m_height);
+		u = fmod(u, 1.0f);
+		v = fmod(v, 1.0f);
 
-		GLubyte alpha{ m_data[(x + y * m_width) * 4 + 3] };
+		// Nearest
+		const int x = (int)(u * (m_width - 1));
+		const int y = (int)(v * (m_height - 1));
+
+		BYTE alpha{ m_data[(x + y * m_width) * 4 + 3] };
 		if (alpha == 0)
 			return 0;
 
-		GLubyte red{ m_data[(x + y * m_width) * 4] };
+		BYTE red{ m_data[(x + y * m_width) * 4] };
 
-		if (alpha == 255 || red==0)
+		if (alpha == 255 || red == 0)
 			return red;
 
-		GLubyte calc= (GLubyte)(red * alpha / 255.0f);
+		BYTE calc = (BYTE)(red * alpha / 255.0f);
 		return calc;
 	}
 
 	// Attempt to load an image from the file and path provided. Returns false on error.
 	bool ImageLoader::Load(const std::string& filepath)
 	{
-		// Determine the format of the image.
-		FREE_IMAGE_FORMAT format{ FreeImage_GetFileType(filepath.c_str(), 0) };
-
-		// Check for not found
-		if (format == -1)
+		
+		// First check file exists
+		if (!exists(fs::path(filepath)))
 		{
-			std::cout << "Could not find: " << filepath << std::endl;
+			std::cout << "File does not exist: " << filepath << std::endl;
 			return false;
 		}
+
+		// Determine the format of the image.
+		FREE_IMAGE_FORMAT format{ FreeImage_GetFileType(filepath.c_str(), 0) };
 
 		// Found image, but couldn't determine the file format? Try again...
 		if (format == FIF_UNKNOWN)
@@ -93,11 +98,7 @@ namespace Helpers
 
 				return false;
 			}
-		}
-
-
-
-		
+		}		
 
 		// Get a pointer to the texture data as an array of unsigned bytes.
 		// Note: At this point bitmap32 ALWAYS holds a 32-bit colour version of our image - so we get our data from that.
@@ -122,7 +123,6 @@ namespace Helpers
 		// 15/04/20: Rebuilt FreeImage with correct order so now RGBA so no need to convert = quicker :)
 		memcpy(m_data, textureData, (size_t)m_width * (size_t)m_height * 1 * 4);
 		
-
 		// Unload the 32-bit colour bitmap
 		FreeImage_Unload(bitmap32);
 
@@ -138,7 +138,7 @@ namespace Helpers
 
 	// Attempt to save an image to the file and path provided. Returns false on error.
 	// Assumes RGBA 32 bit format. Therefore data size must be width * height * 4
-	//  Creates a .png file so don't add an extension to filepath
+	// Creates a .png file so you don't need to add an extension to filepath
 	bool SaveImage(GLubyte* data, int width, int height, const std::string& filepath)
 	{
 		BOOL topDown=0;

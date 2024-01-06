@@ -26,9 +26,6 @@
     <ClInclude Include="Simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThreeGPStart.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Helpers</Filter>
     </ClInclude>
@@ -47,16 +44,16 @@
     <ClInclude Include="RedirectStandardOutput.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="External\IMGUI\imgui_impl_glfw.h">
-      <Filter>External</Filter>
-    </ClInclude>
-    <ClInclude Include="External\IMGUI\imgui_impl_opengl3.h">
-      <Filter>External</Filter>
-    </ClInclude>
     <ClInclude Include="External\IMGUI\imconfig.h">
       <Filter>External</Filter>
     </ClInclude>
     <ClInclude Include="External\IMGUI\imgui.h">
+      <Filter>External</Filter>
+    </ClInclude>
+    <ClInclude Include="External\IMGUI\imgui_impl_glfw.h">
+      <Filter>External</Filter>
+    </ClInclude>
+    <ClInclude Include="External\IMGUI\imgui_impl_opengl3.h">
       <Filter>External</Filter>
     </ClInclude>
     <ClInclude Include="External\IMGUI\imgui_internal.h">
@@ -97,16 +94,19 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="External\IMGUI\imgui.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="External\IMGUI\imgui_draw.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
     <ClCompile Include="External\IMGUI\imgui_impl_glfw.cpp">
       <Filter>External</Filter>
     </ClCompile>
     <ClCompile Include="External\IMGUI\imgui_impl_opengl3.cpp">
       <Filter>External</Filter>
     </ClCompile>
-    <ClCompile Include="External\IMGUI\imgui.cpp">
-      <Filter>External</Filter>
-    </ClCompile>
-    <ClCompile Include="External\IMGUI\imgui_draw.cpp">
+    <ClCompile Include="External\IMGUI\imgui_tables.cpp">
       <Filter>External</Filter>
     </ClCompile>
     <ClCompile Include="External\IMGUI\imgui_widgets.cpp">
@@ -114,16 +114,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\Shaders\vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Natvis Include="External\IMGUI\imgui.natvis">
       <Filter>External</Filter>
     </Natvis>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Data\Shaders\fragment_shader.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Data\Shaders\vertex_shader.glsl">
-      <Filter>Shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 
 namespace Helpers
 {
-	static const float KMaxVerticalAngle = glm::radians(85.0f); //must be less than 90 to avoid gimbal lock
+	static constexpr float KMaxVerticalAngle{ glm::radians(85.0f) }; //must be less than 90 to avoid gimbal lock
 
 	// Parameters are the camera's starting position, starting rotations and optionally speeds for translatation and rotation
 	void Camera::Initialise(const glm::vec3& startPos, const glm::vec3& startRots, float translationPerSecond, float rotationPerSecond)
@@ -37,7 +37,7 @@ namespace Helpers
 			m_rotations.x = -KMaxVerticalAngle;
 	}
 
-	// The look vector can be calulcated from the inverse of the rotation matrix, third column
+	// The look vector can be calculated from the inverse of the rotation matrix, third column
 	glm::vec3 Camera::GetLookVector() const
 	{
 		glm::vec4 forward{ glm::inverse(m_rotationMatrix) * glm::vec4(0, 0, -1, 1) };
@@ -70,6 +70,8 @@ namespace Helpers
 	// Update camera position and rotations and handle user input
 	void Camera::Update(GLFWwindow* window, float timePassedSecs)
 	{
+		assert(window);
+
 		// Not if it is being handled by IMGUI
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		if (io.WantCaptureKeyboard || io.WantCaptureMouse)

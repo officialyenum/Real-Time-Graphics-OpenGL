@@ -1,4 +1,19 @@
-﻿  Renderer.cpp
-C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(94,37): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
-C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(91,14): warning C4101: 'mymesh': unreferenced local variable
-  ThreeGPStart.vcxproj -> C:\Users\d3639511\Source\OpenGL\Real-Time-Graphics-OpenGL\x64\Debug\GraphicsFramework.exe
+﻿  Camera.cpp
+  imgui.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  Helper.cpp
+  ImageLoader.cpp
+  main.cpp
+  Mesh.cpp
+  Renderer.cpp
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(104,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(106,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\ThreeGPStart\Renderer.cpp(219,44): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+  Simulation.cpp
+  Generating Code...
+  glew.c
+  ThreeGPStart.vcxproj -> C:\Users\d3639511\Source\repos\Real-Time-Graphics-OpenGL\x64\Debug\ThreeGPStart.exe

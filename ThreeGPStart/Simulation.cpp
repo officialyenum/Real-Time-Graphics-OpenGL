@@ -11,13 +11,13 @@ bool Simulation::Initialise()
 	m_camera->Initialise(glm::vec3(0, 200, 900), glm::vec3(0)); // Jeep
 	//m_camera->Initialise(glm::vec3(-13.82f, 5.0f, 1.886f), glm::vec3(0.25f, 1.5f, 0), 30.0f,0.8f); // Aqua pig
 
+	std::cout << "Other Controls" << std::endl;
+	std::cout << "F5 - reloads shaders" << std::endl << std::endl;
+
 	// Set up renderer
 	m_renderer = std::make_shared<Renderer>();
 	return m_renderer->InitialiseGeometry();
 }
-
-constexpr float kJeepSpeed{ 5.0f };
-constexpr float kLightSpeed{ 0.3f };
 
 // Handle any user input. Return false if program should close.
 bool Simulation::HandleInput(GLFWwindow* window)
@@ -27,8 +27,12 @@ bool Simulation::HandleInput(GLFWwindow* window)
 	if (io.WantCaptureKeyboard || io.WantCaptureMouse)
 		return true;
 
+	// F5 to reload shaders
+	if ((glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS))
+		m_renderer->CreateProgram();
+
 	// You can get keypresses like this:
-	// if (glfwGetKey(window, GLFW_KEY_W)==GLFW_PRESS) // means W key pressed
+	// if (glfwGetKey(window, GLFW_KEY_W)==GLFW_PRESS)) // means W key pressed
 
 	// You can get mouse button input, returned state is GLFW_PRESS or GLFW_RELEASE
 	// int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
@@ -71,10 +75,8 @@ bool Simulation::Update(GLFWwindow* window)
 	ImGui::NewFrame();
 	m_renderer->DefineGUI();
 
-	// Rendering
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 
 	return true;
 }

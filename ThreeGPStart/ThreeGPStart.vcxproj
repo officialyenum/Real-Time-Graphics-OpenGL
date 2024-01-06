@@ -16,7 +16,6 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ThreeGPStart</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>GraphicsFramework</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -108,7 +107,6 @@
     <ClInclude Include="RedirectStandardOutput.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulation.h" />
-    <ClInclude Include="ThreeGPStart.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
@@ -117,6 +115,7 @@
     <ClCompile Include="External\IMGUI\imgui_draw.cpp" />
     <ClCompile Include="External\IMGUI\imgui_impl_glfw.cpp" />
     <ClCompile Include="External\IMGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="External\IMGUI\imgui_tables.cpp" />
     <ClCompile Include="External\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="ImageLoader.cpp" />
@@ -126,11 +125,11 @@
     <ClCompile Include="Simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="External\IMGUI\imgui.natvis" />
+    <None Include="Data\Shaders\fragment_shader.frag" />
+    <None Include="Data\Shaders\vertex_shader.vert" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shaders\fragment_shader.glsl" />
-    <None Include="Data\Shaders\vertex_shader.glsl" />
+    <Natvis Include="External\IMGUI\imgui.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
