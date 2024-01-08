@@ -80,6 +80,9 @@
     <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Bot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -148,6 +151,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Data\Shaders\apple_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\msaa_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\msaa_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\bot_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\bot_vertex_shader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

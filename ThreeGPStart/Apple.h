@@ -57,6 +57,7 @@ inline void  Apple::InitGeometry()
 	Helpers::ImageLoader imageLoader;
 	imageLoader.Load("Data\\Models\\Apple\\2.jpg");
 
+
 	// Now we can loop through all the mesh in the loaded model:
 	for (const Helpers::Mesh& mesh : loader.GetMeshVector())
 	{

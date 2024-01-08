@@ -34,6 +34,8 @@ void Renderer::DefineGUI()
 
 	ImGui::Checkbox("Wireframe", &m_wireframe);	// A checkbox linked to a member variable
 
+	ImGui::Checkbox("MSAA", &m_msaa);	// A checkbox linked to a member variable
+
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 	ImGui::End();
@@ -128,132 +130,38 @@ bool Renderer::CreateProgram()
 		if (!Helpers::LinkProgramShaders(a_program))
 			return false;
 	}
+
+	{
+		// Create a new program (returns a unqiue id)
+		b_program = glCreateProgram();
+
+		// Load and create vertex and fragment shaders
+		GLuint b_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/bot_vertex_shader.vert") };
+		GLuint b_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/bot_fragment_shader.frag") };
+		if (b_vertex_shader == 0 || b_fragment_shader == 0)
+			return false;
+
+		// Attach the vertex shader to this program (copies it)
+		glAttachShader(b_program, b_vertex_shader);
+
+		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+		// Not needed if you use (location=0) in the vertex shader itself
+		//glBindAttribLocation(m_program, 0, "vertex_position");
+
+		// Attach the fragment shader (copies it)
+		glAttachShader(b_program, b_fragment_shader);
+
+		// Done with the originals of these as we have made copies
+		glDeleteShader(b_vertex_shader);
+		glDeleteShader(b_fragment_shader);
+
+		// Link the shaders, checking for errors
+		if (!Helpers::LinkProgramShaders(b_program))
+			return false;
+	}
 	
 
 	return true;
-}
-
-void Renderer::CreateTerrain(int size)
-{
-	GLuint numCellsX{ 3 };
-	GLuint numCellsZ{ 3 };
-
-	GLuint numVertsX = numCellsX + 1;
-	GLuint numVertsZ = numCellsZ + 1;
-
-	GLuint numTrisX = numCellsX * 2;
-	GLuint numTrisZ = numCellsZ;
-
-	float cellSizeX = size / (float)numCellsX;
-	float cellSizeZ = size / (float)numCellsZ;
-
-	glm::vec3 startPos{ -size / 2.0f, 0, size / 2.0f};
-
-	std::vector<glm::vec3> vertices;
-	for (GLuint z = 0; z < numVertsZ; z++)
-	{
-		for (GLuint x = 0; x < numVertsX; x++)
-		{
-			glm::vec3 pos{startPos}; 
-			pos.x += cellSizeX * x;
-			//pos.y = (float)(rand()%100);
-			pos.z += cellSizeX * z;
-
-			vertices.push_back(pos);
-		}
-	}
-	bool toggle{ true };
-	std::vector<GLuint> elements;
-	for (GLuint z = 0; z < numVertsZ; z++)
-	{
-		for (GLuint x = 0; x < numVertsX; x++)
-		{
-			GLuint startVertex = z * numVertsX + x;
-			if (toggle) {
-				// Triangle 1
-				elements.push_back(startVertex);
-				elements.push_back(startVertex + 1);
-				elements.push_back(startVertex + 1 + numVertsX);
-
-				// Triangle 2
-				elements.push_back(startVertex);
-				elements.push_back(startVertex + 1 + numVertsX);
-				elements.push_back(startVertex + numVertsX);
-			}
-			else {
-				// Triangle 1
-				elements.push_back(startVertex);
-				elements.push_back(startVertex + 1);
-				elements.push_back(startVertex + 1 + numVertsX);
-
-				// Triangle 2
-				elements.push_back(startVertex + 1);
-				elements.push_back(startVertex + 1 + numVertsX);
-				elements.push_back(startVertex + numVertsX);
-			}
-			toggle = !toggle;
-			
-		}
-		toggle = !toggle;
-	}
-
-	/*
-			Create Vertex Buffer Object (VBO) to hold vertex positions for terrain
-	*/
-
-	GLuint positionsVBO;
-	glGenBuffers(1, &positionsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-	GLuint texcoordsVBO;
-	glGenBuffers(1, &texcoordsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	GLuint elementsEBO;
-	glGenBuffers(1, &elementsEBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * elements.size(), &elements[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	// VAO
-
-	glGenVertexArrays(1, &m_terrain_VAO);
-	glBindVertexArray(m_terrain_VAO);
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(
-		0,                  // attribute 0
-		3,                  // size in bytes of each item in the stream
-		GL_FLOAT,           // type of the item
-		GL_FALSE,           // normalized or not (advanced)
-		0,                  // stride (advanced)
-		(void*)0            // array buffer offset (advanced)
-	);
-
-	glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(
-		1,                  // attribute 0
-		2,                  // size in bytes of each item in the stream
-		GL_FLOAT,           // type of the item
-		GL_FALSE,           // normalized or not (advanced)
-		0,                  // stride (advanced)
-		(void*)0            // array buffer offset (advanced)
-	);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
-
-
-	// Clear VAO binding
-	glBindVertexArray(0);
 }
 
 // Load / create geometry into OpenGL buffers	
@@ -265,6 +173,8 @@ bool Renderer::InitialiseGeometry()
 
 	//Jeep
 	jeepInstance.InitGeometry();
+	//Apple
+	botInstance.InitGeometry();
 	//Apple
 	appleInstance.InitGeometry();
 
@@ -297,6 +207,10 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	//Render Jeep;
 	{
 		jeepInstance.RenderJeep(m_program, camera);
+	}
+	//Render Bot;
+	{
+		botInstance.RenderBot(b_program, camera);
 	}
 	//Render Terrain;
 	{

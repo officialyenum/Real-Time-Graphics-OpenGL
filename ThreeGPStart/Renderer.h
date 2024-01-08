@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Terrain.h"
 #include "Apple.h"
+#include "Bot.h"
 
 
 
@@ -40,6 +41,8 @@ private:
 	GLuint l_program{ 0 };
 	// Apple Program object - to host light shaders
 	GLuint a_program{ 0 };
+	// Apple Program object - to host light shaders
+	GLuint b_program{ 0 };
 
 	// Vertex Array Object to wrap all render settings
 	GLuint m_terrain_VAO{ 0 };
@@ -54,9 +57,11 @@ private:
 
 	Jeep jeepInstance;
 	Terrain terrainInstance;
-	Apple appleInstance;
+	Apple appleInstance; 
+	Bot botInstance;
 
 	bool m_wireframe{ false };
+	bool m_msaa{ false };
 	bool m_cullFace{ true };	
 
 	std::vector<MeshStruct> m_meshVector;

@@ -1,5 +1,6 @@
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\vc143.pdb
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\simulation.obj
+c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\renderer.obj
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\mesh.obj
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\main.obj
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\imageloader.obj
@@ -12,7 +13,6 @@ c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\imgui.obj
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\camera.obj
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\glew.obj
-c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\renderer.obj
 c:\users\d3639511\source\repos\real-time-graphics-opengl\x64\debug\threegpstart.exe
 c:\users\d3639511\source\repos\real-time-graphics-opengl\threegpstart\x64\debug\threegpstart.ilk
 c:\users\d3639511\source\repos\real-time-graphics-opengl\x64\debug\threegpstart.pdb
