@@ -72,14 +72,14 @@ bool Renderer::CreateProgram()
 
 void Renderer::CreateTerrain(int size)
 {
-	int numCellsX{ 3 };
-	int numCellsZ{ 3 };
+	GLuint numCellsX{ 3 };
+	GLuint numCellsZ{ 3 };
 
-	int numVertsX = numCellsX + 1;
-	int numVertsZ = numCellsZ + 1;
+	GLuint numVertsX = numCellsX + 1;
+	GLuint numVertsZ = numCellsZ + 1;
 
-	int numTrisX = numCellsX * 2;
-	int numTrisZ = numCellsZ;
+	GLuint numTrisX = numCellsX * 2;
+	GLuint numTrisZ = numCellsZ;
 
 	float cellSizeX = size / (float)numCellsX;
 	float cellSizeZ = size / (float)numCellsZ;
@@ -87,9 +87,9 @@ void Renderer::CreateTerrain(int size)
 	glm::vec3 startPos{ -size / 2.0f, 0, size / 2.0f};
 
 	std::vector<glm::vec3> vertices;
-	for (int z = 0; z < numVertsZ; z++)
+	for (GLuint z = 0; z < numVertsZ; z++)
 	{
-		for (int x = 0; x < numVertsX; x++)
+		for (GLuint x = 0; x < numVertsX; x++)
 		{
 			glm::vec3 pos{startPos}; 
 			pos.x += cellSizeX * x;
