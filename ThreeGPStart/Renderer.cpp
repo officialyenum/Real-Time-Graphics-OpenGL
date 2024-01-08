@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include "ImageLoader.h"
 
+
+
 std::string MaterialIndexArray[2] =
 {
 	"a","b"
@@ -40,32 +42,93 @@ void Renderer::DefineGUI()
 // Load, compile and link the shaders and create a program object to host them
 bool Renderer::CreateProgram()
 {
-	// Create a new program (returns a unqiue id)
-	m_program = glCreateProgram();
+	{
+		// Create a new program (returns a unqiue id)
+		m_program = glCreateProgram();
 
-	// Load and create vertex and fragment shaders
-	GLuint vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/vertex_shader.vert") };
-	GLuint fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/fragment_shader.frag") };
-	if (vertex_shader == 0 || fragment_shader == 0)
-		return false;
+		// Load and create vertex and fragment shaders
+		GLuint vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/vertex_shader.vert") };
+		GLuint fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/fragment_shader.frag") };
+		if (vertex_shader == 0 || fragment_shader == 0)
+			return false;
 
-	// Attach the vertex shader to this program (copies it)
-	glAttachShader(m_program, vertex_shader);
+		// Attach the vertex shader to this program (copies it)
+		glAttachShader(m_program, vertex_shader);
 
-	// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
-	// Not needed if you use (location=0) in the vertex shader itself
-	//glBindAttribLocation(m_program, 0, "vertex_position");
+		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+		// Not needed if you use (location=0) in the vertex shader itself
+		//glBindAttribLocation(m_program, 0, "vertex_position");
 
-	// Attach the fragment shader (copies it)
-	glAttachShader(m_program, fragment_shader);
+		// Attach the fragment shader (copies it)
+		glAttachShader(m_program, fragment_shader);
 
-	// Done with the originals of these as we have made copies
-	glDeleteShader(vertex_shader);
-	glDeleteShader(fragment_shader);
+		// Done with the originals of these as we have made copies
+		glDeleteShader(vertex_shader);
+		glDeleteShader(fragment_shader);
 
-	// Link the shaders, checking for errors
-	if (!Helpers::LinkProgramShaders(m_program))
-		return false;
+		// Link the shaders, checking for errors
+		if (!Helpers::LinkProgramShaders(m_program))
+			return false;
+	}
+	
+
+	{
+		l_program = glCreateProgram();
+
+		// Load and create vertex and fragment shaders
+		GLuint l_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/terrain_vertex_shader.vert") };
+		GLuint l_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/terrain_fragment_shader.frag") };
+		if (l_vertex_shader == 0 || l_fragment_shader == 0)
+			return false;
+
+		// Attach the vertex shader to this program (copies it)
+		glAttachShader(l_program, l_vertex_shader);
+
+		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+		// Not needed if you use (location=0) in the vertex shader itself
+		//glBindAttribLocation(m_program, 0, "vertex_position");
+
+		// Attach the fragment shader (copies it)
+		glAttachShader(l_program, l_fragment_shader);
+
+		// Done with the originals of these as we have made copies
+		glDeleteShader(l_vertex_shader);
+		glDeleteShader(l_fragment_shader);
+
+		// Link the shaders, checking for errors
+		if (!Helpers::LinkProgramShaders(l_program))
+			return false;
+	}
+
+	{
+		// Create a new program (returns a unqiue id)
+		a_program = glCreateProgram();
+
+		// Load and create vertex and fragment shaders
+		GLuint a_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/apple_vertex_shader.vert") };
+		GLuint a_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/apple_fragment_shader.frag") };
+		if (a_vertex_shader == 0 || a_fragment_shader == 0)
+			return false;
+
+		// Attach the vertex shader to this program (copies it)
+		glAttachShader(a_program, a_vertex_shader);
+
+		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+		// Not needed if you use (location=0) in the vertex shader itself
+		//glBindAttribLocation(m_program, 0, "vertex_position");
+
+		// Attach the fragment shader (copies it)
+		glAttachShader(a_program, a_fragment_shader);
+
+		// Done with the originals of these as we have made copies
+		glDeleteShader(a_vertex_shader);
+		glDeleteShader(a_fragment_shader);
+
+		// Link the shaders, checking for errors
+		if (!Helpers::LinkProgramShaders(a_program))
+			return false;
+	}
+	
 
 	return true;
 }
@@ -200,139 +263,14 @@ bool Renderer::InitialiseGeometry()
 	if (!CreateProgram())
 		return false;
 
-	std::cout <<  "---------------------------------" << "\n";
-	Helpers::ModelLoader loader;
-	if (!loader.LoadFromFile("Data\\Models\\Jeep\\jeep.obj"))
-		return false;
+	//Jeep
+	jeepInstance.InitGeometry();
+	//Apple
+	appleInstance.InitGeometry();
 
-	// Todo: Load Image Texture
-	Helpers::ImageLoader imageLoader;
-	if (!imageLoader.Load("Data\\Models\\Jeep\\jeep_rood.jpg"))
-		return false;
-
-	// Now we can loop through all the mesh in the loaded model:
-	for (const Helpers::Mesh& mesh : loader.GetMeshVector())
-	{
-		MeshStruct mymesh;
-		std::cout << mesh.name << " + MatIndex: " << mesh.materialIndex << "\n";
-
-		mymesh.numElements = mesh.elements.size();
-
-		/*
-			Create Vertex Buffer Object (VBO) to hold vertex positions
-		*/
-
-		GLuint positionsVBO;
-		glGenBuffers(1, &positionsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * mesh.vertices.size(), mesh.vertices.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-		GLuint coloursVBO;
-		glGenBuffers(1, &coloursVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, coloursVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * mesh.normals.size(), mesh.normals.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		GLuint texcoordsVBO;
-		glGenBuffers(1, &texcoordsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * mesh.uvCoords.size(), mesh.uvCoords.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-
-		GLuint elementsEBO;
-		glGenBuffers(1, &elementsEBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh.elements.size(), mesh.elements.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-		// VAO
-
-		glGenVertexArrays(1, &mymesh.VAO);
-		glBindVertexArray(mymesh.VAO);
-
-	
-		glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(
-			0,                  // attribute 0
-			3,                  // size in bytes of each item in the stream
-			GL_FLOAT,           // type of the item
-			GL_FALSE,           // normalized or not (advanced)
-			0,                  // stride (advanced)
-			(void*)0            // array buffer offset (advanced)
-		);
-
-
-		glBindBuffer(GL_ARRAY_BUFFER, coloursVBO);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(
-			1,                  // attribute 0
-			3,                  // size in bytes of each item in the stream
-			GL_FLOAT,           // type of the item
-			GL_FALSE,           // normalized or not (advanced)
-			0,                  // stride (advanced)
-			(void*)0            // array buffer offset (advanced)
-		);
-
-		glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(
-			2,                  // attribute 0
-			2,                  // size in bytes of each item in the stream
-			GL_FLOAT,           // type of the item
-			GL_FALSE,           // normalized or not (advanced)
-			0,                  // stride (advanced)
-			(void*)0            // array buffer offset (advanced)
-		);
-
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
-
-
-		// Clear VAO binding
-		glBindVertexArray(0);
-
-		m_meshVector.push_back(mymesh);
-
-	}
-	std::cout << "---------------------------------" << "\n";
-
-
-
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
-
-	//FXAA Framebuffer + Texture
-	glGenFramebuffers(1, &fxaa_fbo_);
-	glGenTextures(1, &fxaa_tex_);
-	glBindTexture(GL_TEXTURE_2D, fxaa_tex_);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-
-
-	// FXAA BUFFER
-
-	glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fxaa_tex_, 0);
-
-	GLenum bufs4[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs4);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
+	//Terrain
+	terrainInstance.SetPointLightPositions();
+	terrainInstance.InitGeometry(10000);
 
 	return true;
 }
@@ -356,60 +294,19 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Compute viewport and projection matrix
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
-	const float aspect_ratio = viewportSize[2] / (float)viewportSize[3];
-	glm::mat4 projection_xform = glm::perspective(glm::radians(45.0f), aspect_ratio, 1.0f, 4000.0f);
-
-
-
-	// Compute camera view matrix and combine with projection matrix for passing to shader
-	glm::mat4 view_xform = glm::lookAt(camera.GetPosition(), camera.GetPosition() + camera.GetLookVector(), camera.GetUpVector());
-	glm::mat4 combined_xform = projection_xform * view_xform;
-
-	// Use our program. Doing this enables the shaders we attached previously.
-	glUseProgram(m_program);
-
-	// Send the combined matrix to the shader in a uniform
-	glUniformMatrix4fv(glGetUniformLocation(m_program, "combined_xform"), 1, GL_FALSE, glm::value_ptr(combined_xform));
-
-	glm::mat4 model_xform = glm::mat4(1);
-
-	// Uncomment all the lines below to rotate cube first round y then round x
-	//static float angle = 0;
-	//static bool rotateY = true;
-
-	/*angle += 0.001f;
-	if (angle > glm::two_pi<float>())
+	//Render Jeep;
 	{
-		angle = 0;
-		rotateY = !rotateY;
-	}*/
-
-	// Send the model matrix to the shader in a uniform
-	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));
-
-
-	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
-	glBindTexture(GL_TEXTURE_2D, fxaa_tex_);
-	glUniform1i(glGetUniformLocation(m_program, "sample_tex"), 0);
-
-	// Bind our VAO and render
-
-
-
-	for (const MeshStruct mesh : m_meshVector)
-	{
-		glBindVertexArray(mesh.VAO);
-		glDrawElements(GL_TRIANGLES, mesh.numElements, GL_UNSIGNED_INT, (void*)0);
+		jeepInstance.RenderJeep(m_program, camera);
 	}
+	//Render Terrain;
+	{
+		terrainInstance.RenderTerrain(l_program, camera);
+	}
+	//Render Apple;
+	{
 
-
-	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	//glBindFramebuffer(GL_READ_FRAMEBUFFER, fxaa_fbo_);
-	//glBlitFramebuffer(0, 0, viewportSize[2], viewportSize[3], 0, 0, viewportSize[2], viewportSize[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-
+		appleInstance.RenderApple(a_program, camera);
+	}
+	
 
 }

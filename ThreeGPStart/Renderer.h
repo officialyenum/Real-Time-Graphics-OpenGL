@@ -2,9 +2,13 @@
 
 #include "ExternalLibraryHeaders.h"
 
+#include "Object/Jeep.h"
 #include "Helper.h"
 #include "Mesh.h"
 #include "Camera.h"
+#include "Terrain.h"
+#include "Apple.h"
+
 
 
 struct Mesh
@@ -30,10 +34,12 @@ class Renderer
 private:
 
 	std::vector<Model> m_models;
-	// Program object - to host core shaders
+	// Jeep Program object - to host core shaders
 	GLuint m_program{ 0 };
-	// Program object - to host light shaders
+	// Terrain Program object - to host light shaders
 	GLuint l_program{ 0 };
+	// Apple Program object - to host light shaders
+	GLuint a_program{ 0 };
 
 	// Vertex Array Object to wrap all render settings
 	GLuint m_terrain_VAO{ 0 };
@@ -45,6 +51,10 @@ private:
 
 	GLuint fxaa_fbo_{ 0 };
 	GLuint fxaa_tex_{ 0 };
+
+	Jeep jeepInstance;
+	Terrain terrainInstance;
+	Apple appleInstance;
 
 	bool m_wireframe{ false };
 	bool m_cullFace{ true };	
