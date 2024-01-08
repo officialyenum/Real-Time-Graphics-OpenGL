@@ -44,8 +44,8 @@ bool Renderer::CreateProgram()
 	m_program = glCreateProgram();
 
 	// Load and create vertex and fragment shaders
-	GLuint vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Shaders/core_vertex_shader.vert") };
-	GLuint fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Shaders/core_fragment_shader.frag") };
+	GLuint vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/vertex_shader.vert") };
+	GLuint fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/fragment_shader.frag") };
 	if (vertex_shader == 0 || fragment_shader == 0)
 		return false;
 
@@ -67,48 +67,19 @@ bool Renderer::CreateProgram()
 	if (!Helpers::LinkProgramShaders(m_program))
 		return false;
 
-	// Create a new program (returns a unqiue id)
-	terrain_program = glCreateProgram();
-
-	// Load and create vertex and fragment shaders
-	GLuint vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Shaders/terrain_vertex_shader.vert") };
-	GLuint fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Shaders/terrain_fragment_shader.frag") };
-	if (vertex_shader == 0 || fragment_shader == 0)
-		return false;
-
-	// Attach the vertex shader to this program (copies it)
-	glAttachShader(terrain_program, vertex_shader);
-
-	// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
-	// Not needed if you use (location=0) in the vertex shader itself
-	//glBindAttribLocation(m_program, 0, "vertex_position");
-
-	// Attach the fragment shader (copies it)
-	glAttachShader(terrain_program, fragment_shader);
-
-	// Done with the originals of these as we have made copies
-	glDeleteShader(vertex_shader);
-	glDeleteShader(fragment_shader);
-
-	// Link the shaders, checking for errors
-	if (!Helpers::LinkProgramShaders(terrain_program))
-		return false;
-
 	return true;
 }
 
 void Renderer::CreateTerrain(int size)
 {
+	GLuint numCellsX{ 3 };
+	GLuint numCellsZ{ 3 };
 
+	GLuint numVertsX = numCellsX + 1;
+	GLuint numVertsZ = numCellsZ + 1;
 
-	int numCellsX{ 3 };
-	int numCellsZ{ 3 };
-
-	int numVertsX = numCellsX + 1;
-	int numVertsZ = numCellsZ + 1;
-
-	int numTrisX = numCellsX * 2;
-	int numTrisZ = numCellsZ;
+	GLuint numTrisX = numCellsX * 2;
+	GLuint numTrisZ = numCellsZ;
 
 	float cellSizeX = size / (float)numCellsX;
 	float cellSizeZ = size / (float)numCellsZ;
@@ -116,9 +87,9 @@ void Renderer::CreateTerrain(int size)
 	glm::vec3 startPos{ -size / 2.0f, 0, size / 2.0f};
 
 	std::vector<glm::vec3> vertices;
-	for (int z = 0; z < numVertsZ; z++)
+	for (GLuint z = 0; z < numVertsZ; z++)
 	{
-		for (int x = 0; x < numVertsX; x++)
+		for (GLuint x = 0; x < numVertsX; x++)
 		{
 			glm::vec3 pos{startPos}; 
 			pos.x += cellSizeX * x;
@@ -217,36 +188,9 @@ void Renderer::CreateTerrain(int size)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsEBO);
 
+
 	// Clear VAO binding
 	glBindVertexArray(0);
-
-	this->DrawImage(terrain_tex_, "Data\\Textures\\floor.jpg");
-
-
-}
-
-GLuint Renderer::DrawImage(GLuint textureID,const char* filename)
-{
-
-	// Todo: Load Image Texture
-	Helpers::ImageLoader imageLoader;
-
-	imageLoader.Load(filename);
-	glGenTextures(1, &textureID);
-
-	// Assign texture to ID
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageLoader.Width(), imageLoader.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, imageLoader.GetData());
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	return textureID;
 }
 
 // Load / create geometry into OpenGL buffers	
@@ -259,6 +203,11 @@ bool Renderer::InitialiseGeometry()
 	std::cout <<  "---------------------------------" << "\n";
 	Helpers::ModelLoader loader;
 	if (!loader.LoadFromFile("Data\\Models\\Jeep\\jeep.obj"))
+		return false;
+
+	// Todo: Load Image Texture
+	Helpers::ImageLoader imageLoader;
+	if (!imageLoader.Load("Data\\Models\\Jeep\\jeep_rood.jpg"))
 		return false;
 
 	// Now we can loop through all the mesh in the loaded model:
@@ -360,20 +309,27 @@ bool Renderer::InitialiseGeometry()
 
 	//FXAA Framebuffer + Texture
 	glGenFramebuffers(1, &fxaa_fbo_);
+	glGenTextures(1, &fxaa_tex_);
+	glBindTexture(GL_TEXTURE_2D, fxaa_tex_);
 
-	this->DrawImage(fxaa_tex_, "Data\\Models\\Jeep\\jeep_rood.jpg");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+
 
 	// FXAA BUFFER
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fxaa_tex_, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, terrain_tex_, 0);
 
-	GLenum bufs4[] = { 
-		GL_COLOR_ATTACHMENT0,
-		GL_COLOR_ATTACHMENT1,
-	};
+	GLenum bufs4[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, bufs4);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
@@ -400,9 +356,6 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	
-	 
-	
 	// Compute viewport and projection matrix
 	GLint viewportSize[4];
 	glGetIntegerv(GL_VIEWPORT, viewportSize);
@@ -414,28 +367,14 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	// Compute camera view matrix and combine with projection matrix for passing to shader
 	glm::mat4 view_xform = glm::lookAt(camera.GetPosition(), camera.GetPosition() + camera.GetLookVector(), camera.GetUpVector());
 	glm::mat4 combined_xform = projection_xform * view_xform;
-	glm::mat4 model_xform = glm::mat4(1);
-	// Draw Terrain
-	glUseProgram(terrain_program);
 
-	// Send the combined matrix to the shader in a uniform
-	glUniform1f(glGetUniformLocation(terrain_program, "gMinHeight"), 2.0f);
-	glUniform1f(glGetUniformLocation(terrain_program, "gMaxHeight"), 2.0f);
-	glUniformMatrix4fv(glGetUniformLocation(terrain_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));
-	
-
-	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
-	glBindTexture(GL_TEXTURE_2D, terrain_tex_);
-	glUniform1i(glGetUniformLocation(terrain_program, "terrain_tex"), 0);
-
-
-	// Draw Jeep
 	// Use our program. Doing this enables the shaders we attached previously.
 	glUseProgram(m_program);
 
 	// Send the combined matrix to the shader in a uniform
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "combined_xform"), 1, GL_FALSE, glm::value_ptr(combined_xform));
 
+	glm::mat4 model_xform = glm::mat4(1);
 
 	// Uncomment all the lines below to rotate cube first round y then round x
 	//static float angle = 0;
