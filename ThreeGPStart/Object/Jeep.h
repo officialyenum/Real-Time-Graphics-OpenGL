@@ -20,7 +20,7 @@ public:
 	~Jeep();
 
 	void InitGeometry(const std::string texture);
-	void RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position);
+	void RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos);
 
 	//Render in Scene
 
@@ -139,12 +139,6 @@ inline void Jeep::InitGeometry(const std::string texture)
 	std::cout << "---------------------------------" << "\n";
 
 
-
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
-
-	//FXAA Framebuffer + Texture
-	glGenFramebuffers(1, &fxaa_fbo_);
 	glGenTextures(1, &jeep_mesh.meshTexture);
 	glBindTexture(GL_TEXTURE_2D, jeep_mesh.meshTexture);
 
@@ -157,33 +151,24 @@ inline void Jeep::InitGeometry(const std::string texture)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-
-	// FXAA BUFFER
-
-	glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, jeep_mesh.meshTexture, 0);
-
-	GLenum bufs4[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs4);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
 }
 
-inline void Jeep::RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position)
+inline void Jeep::RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos)
 {
 	
+	glUseProgram(m_program);
+	glUniform3f(glGetUniformLocation(m_program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
+	glUniform3f(glGetUniformLocation(m_program, "viewPos"), camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-	// Compute viewport and projection matrix
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
-	const float aspect_ratio = viewportSize[2] / (float)viewportSize[3];
 
-	glm::mat4 projection_xform = glm::perspective(glm::radians(45.0f), aspect_ratio, 1.0f, 4000.0f);
+	// Set lights properties
+	glUniform3f(glGetUniformLocation(m_program, "light.ambient"), 0.2f, 0.2f, 0.2f);
+	glUniform3f(glGetUniformLocation(m_program, "light.diffuse"), 0.5f, 0.5f, 0.5f);
+	glUniform3f(glGetUniformLocation(m_program, "light.specular"), 1.0f, 1.0f, 1.0f);
 
-	// Compute camera view matrix and combine with projection matrix for passing to shader
-	glm::mat4 view_xform = glm::lookAt(camera.GetPosition(), camera.GetPosition() + camera.GetLookVector(), camera.GetUpVector());
-	glm::mat4 combined_xform = projection_xform * view_xform;
+	// Set material properties
+	glUniform1f(glGetUniformLocation(m_program, "material.shininess"), 32.0f);
+
 
 	// Use our program. Doing this enables the shaders we attached previously.
 	glUseProgram(m_program);
@@ -194,15 +179,12 @@ inline void Jeep::RenderJeep(GLuint& m_program, const Helpers::Camera& camera, g
 	glm::mat4 model_xform = glm::mat4(1);
 	model_xform = glm::translate(model_xform, glm::vec3(position));
 
-
 	// Send the model matrix to the shader in a uniform
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));
 
-
-	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
+	// Bind diffuse map
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, jeep_mesh.meshTexture);
-	glUniform1i(glGetUniformLocation(m_program, "sample_tex"), 0);
-
 	// Bind our VAO and render
 
 	for (const JeepStruct mesh : jeep_meshVector)

@@ -101,7 +101,7 @@ namespace Helpers
 
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
-		glEnable(GL_MULTISAMPLE);
+		//glEnable(GL_MULTISAMPLE);
 
 // Turn on debug mode
 #ifdef _DEBUG

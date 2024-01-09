@@ -3,7 +3,7 @@
 uniform mat4 combined_xform;
 uniform mat4 model_xform;
 
-layout (location=0) in vec3 vertex_position;
+layout (location=0) in vec2 vertex_position;
 layout (location=1) in vec2 vertex_texcoords;
 
 out vec2 varying_texcoords;

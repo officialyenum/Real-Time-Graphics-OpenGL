@@ -8,7 +8,7 @@ bool Simulation::Initialise()
 {
 	// Set up camera
 	m_camera = std::make_shared<Helpers::Camera>();
-	m_camera->Initialise(glm::vec3(-0.1, 285.0f, -2922.3f), glm::vec3(-0.1f, 3.4f, 0.0f)); // Jeep
+	m_camera->Initialise(glm::vec3(532.0f, 880.f, -2156.f), glm::vec3(0.33f, 3.9f, 0.0f)); // Jeep
 	//m_camera->Initialise(glm::vec3(-13.82f, 5.0f, 1.886f), glm::vec3(0.25f, 1.5f, 0), 30.0f,0.8f); // Aqua pig
 
 	std::cout << "Other Controls" << std::endl;

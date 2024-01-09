@@ -22,7 +22,7 @@ public:
 	~WildWest();
 
 	void InitGeometry(GLuint& m_program, const std::string texture);
-	void RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position);
+	void RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos);
 
 	//Render in Scene
 
@@ -30,8 +30,6 @@ protected:
 	WildWestStruct m_mesh;
 	std::vector< WildWestStruct> m_meshVector;
 	GLuint fxaa_fbo_{ 0 };
-	// Light attributes
-	glm::vec3 lightPos;
 
 	GLuint positionsVBO{ 0 };
 	GLuint coloursVBO{ 0 };
@@ -42,7 +40,7 @@ protected:
 
 inline  WildWest::WildWest()
 {
-	lightPos = glm::vec3(0.7f, 0.2f, 2.0f);
+
 }
 
 inline  WildWest::~WildWest()
@@ -185,7 +183,8 @@ inline void WildWest::InitGeometry(GLuint& m_program, const std::string texture)
 	glUniform1i(glGetUniformLocation(m_program, "material.specular"), 1);
 }
 
-inline void WildWest::RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position)
+
+inline void WildWest::RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos)
 {
 
 
@@ -202,16 +201,6 @@ inline void WildWest::RenderWildWest(GLuint& m_program, const Helpers::Camera& c
 	// Set material properties
 	glUniform1f(glGetUniformLocation(m_program, "material.shininess"), 32.0f);
 
-	// Compute viewport and projection matrix
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
-	const float aspect_ratio = viewportSize[2] / (float)viewportSize[3];
-
-	glm::mat4 projection_xform = glm::perspective(glm::radians(45.0f), aspect_ratio, 1.0f, 4000.0f);
-
-	// Compute camera view matrix and combine with projection matrix for passing to shader
-	glm::mat4 view_xform = glm::lookAt(camera.GetPosition(), camera.GetPosition() + camera.GetLookVector(), camera.GetUpVector());
-	glm::mat4 combined_xform = projection_xform * view_xform;
 
 	// Use our program. Doing this enables the shaders we attached previously.
 	glUseProgram(m_program);

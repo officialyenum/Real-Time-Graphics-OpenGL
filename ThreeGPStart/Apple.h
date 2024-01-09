@@ -20,7 +20,7 @@ public:
 	~Apple();
 
 	void InitGeometry(const std::string texture);
-	void RenderApple(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position);
+	void RenderApple(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos);
 
 	//Render in Scene
 
@@ -40,7 +40,7 @@ protected:
 
 inline  Apple::Apple()
 {
-	lightPos = glm::vec3(0.7f, 0.2f, 2.0f);
+
 }
 
 inline  Apple::~Apple()
@@ -162,20 +162,23 @@ inline void Apple::InitGeometry(const std::string texture)
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-inline void Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position)
+inline void Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos)
 {
 
 
-	// Compute viewport and projection matrix
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
-	const float aspect_ratio = viewportSize[2] / (float)viewportSize[3];
+	glUseProgram(m_program);
+	glUniform3f(glGetUniformLocation(m_program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
+	glUniform3f(glGetUniformLocation(m_program, "viewPos"), camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-	glm::mat4 projection_xform = glm::perspective(glm::radians(45.0f), aspect_ratio, 1.0f, 4000.0f);
 
-	// Compute camera view matrix and combine with projection matrix for passing to shader
-	glm::mat4 view_xform = glm::lookAt(camera.GetPosition(), camera.GetPosition() + camera.GetLookVector(), camera.GetUpVector());
-	glm::mat4 combined_xform = projection_xform * view_xform;
+	// Set lights properties
+	glUniform3f(glGetUniformLocation(m_program, "light.ambient"), 0.2f, 0.2f, 0.2f);
+	glUniform3f(glGetUniformLocation(m_program, "light.diffuse"), 0.5f, 0.5f, 0.5f);
+	glUniform3f(glGetUniformLocation(m_program, "light.specular"), 1.0f, 1.0f, 1.0f);
+
+	// Set material properties
+	glUniform1f(glGetUniformLocation(m_program, "material.shininess"), 32.0f);
+
 
 	// Use our program. Doing this enables the shaders we attached previously.
 	glUseProgram(m_program);
@@ -189,14 +192,12 @@ inline void Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera,
 	// Send the model matrix to the shader in a uniform
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));
 
-
-	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
+	// Bind diffuse map
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
-	glUniform1i(glGetUniformLocation(m_program, "sampler_tex"), 0);
 
-	// Bind our VAO and render
 
-	for (const  AppleStruct mesh : m_meshVector)
+	for (const AppleStruct mesh : m_meshVector)
 	{
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numElements, GL_UNSIGNED_INT, (void*)0);

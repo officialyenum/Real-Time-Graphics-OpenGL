@@ -5,6 +5,7 @@ out vec4 fragment_colour;
 
 in vec2 varying_texcoords;
 
+//uniform sampler2D screenTexture;
 //notice the sampler
 uniform sampler2DMS screencapture;
 uniform int viewport_width;
@@ -25,5 +26,10 @@ void main(void)
 	vec4 sample3 = texelFetch(screencapture, vpCoords, 2);
 	vec4 sample4 = texelFetch(screencapture, vpCoords, 3);
 	fragment_colour = (sample1 + sample2 + sample3 + sample4) / 4.0f;
+
+
+//    vec3 col = texture(screenTexture, varying_texcoords).rgb;
+//    float grayscale = 0.2126 * col.r + 0.7152 * col.g + 0.0722 * col.b;
+//    fragment_colour = vec4(vec3(grayscale), 1.0);
 
 }

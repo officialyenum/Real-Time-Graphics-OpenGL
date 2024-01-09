@@ -107,9 +107,11 @@
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MSAAFrameBuffer.h" />
     <ClInclude Include="Object\Jeep.h" />
     <ClInclude Include="RedirectStandardOutput.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="ShadowMapBuffer.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="WildWest.h" />
@@ -137,11 +139,15 @@
     <None Include="Data\Shaders\bot_vertex_shader.vert" />
     <None Include="Data\Shaders\depth_buffer_fragment_shader.frag" />
     <None Include="Data\Shaders\depth_buffer_vertex_shader.vert" />
+    <None Include="Data\Shaders\direction_light_fragment_shader.frag" />
     <None Include="Data\Shaders\fragment_shader.frag" />
+    <None Include="Data\Shaders\lamp_vertex_shader.vert" />
     <None Include="Data\Shaders\lighting_fragment_shader.frag" />
     <None Include="Data\Shaders\lighting_vertex_shader.vert" />
     <None Include="Data\Shaders\msaa_fragment_shader.frag" />
     <None Include="Data\Shaders\msaa_vertex_shader.vert" />
+    <None Include="Data\Shaders\shadow_buffer_fragment_shader.frag" />
+    <None Include="Data\Shaders\shadow_buffer_vertex_shader.vert" />
     <None Include="Data\Shaders\terrain_fragment_shader.frag" />
     <None Include="Data\Shaders\terrain_vertex_shader.vert" />
     <None Include="Data\Shaders\vertex_shader.vert" />

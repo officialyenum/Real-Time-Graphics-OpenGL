@@ -86,6 +86,12 @@
     <ClInclude Include="WildWest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MSAAFrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMapBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -178,6 +184,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Data\Shaders\west_terrain_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\direction_light_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\lamp_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\shadow_buffer_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\shadow_buffer_vertex_shader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

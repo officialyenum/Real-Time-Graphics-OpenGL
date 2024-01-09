@@ -11,6 +11,9 @@
 #include "Bot.h"
 #include "DepthFrameBuffer.h"
 #include "WildWest.h"
+#include "Light.h"
+#include "MSAAFrameBuffer.h"
+#include "ShadowMapBuffer.h"
 
 
 
@@ -40,15 +43,21 @@ private:
 	// Jeep Program object - to host core shaders
 	GLuint m_program{ 0 };
 	// Terrain Program object - to host light shaders
-	GLuint l_program{ 0 };
+	GLuint terrain_program{ 0 };
 	// Apple Program object - to host light shaders
-	GLuint a_program{ 0 };
+	GLuint apple_program{ 0 };
 	// Apple Program object - to host light shaders
 	GLuint b_program{ 0 };
-	// Apple Program object - to host light shaders
+	// West Program object - to host light shaders
 	GLuint west_program{ 0 };
 	// Apple Program object - to host light shaders
 	GLuint depth_program{ 0 };
+	// Light Program object - to host light shaders
+	GLuint light_source_program{ 0 };
+	// MSAA Program object - to host light shaders
+	GLuint msaa_program{ 0 };
+	// Shadow Map Program object - to host light shaders
+	GLuint shadow_program{ 0 };
 	
 
 	// Vertex Array Object to wrap all render settings
@@ -64,28 +73,37 @@ private:
 
 	//Jeep
 	Jeep armyJeepInstance;
-	glm::vec3 army_jeep_position { glm::vec3(-600.f, 0.f, 150.f) };
+	glm::vec3 army_jeep_position { glm::vec3(-600.f, 0.f, -200.f) };
 	Jeep redJeepInstance;
-	glm::vec3 red_jeep_position { glm::vec3(-800.f, 0.f, -300.f) };
+	glm::vec3 red_jeep_position { glm::vec3(-800.f, 0.f, -800.f) };
 
 	
-	DepthBuffer depthBufferInstance;
 	Terrain terrainInstance;
-	glm::vec3 terrain_position { glm::vec3(100.f, 100.f, 500.f) };
+	glm::vec3 terrain_position { glm::vec3(100.f, 0.f, 500.f) };
 	Apple appleInstance;
 	glm::vec3 apple_position { glm::vec3(0.f, 240.f, 300.f) };
 	Bot botInstance;
 
+	//Lights
+	Light lightSource;
+	glm::vec3 light_source_position { glm::vec3(lightSource.GetPosition()) };
+
 	WildWest wildWestInstance;
 	glm::vec3 wild_west_position { glm::vec3(-200.f, 100.f, 500.f) };
 
+	//Buffers
+	MSAAFrameBuffer msaaFrameBuffer;
+	DepthBuffer depthBufferInstance;
+	ShadowMapBuffer shadowMapBufferInstance;
+
 	//Camera
-	glm::vec3 camera_position { glm::vec3(-0.1f, 285.f, -2930.f) };
-	glm::vec3 camera_rotation { glm::vec3(-0.07f, 3.5f, 0.0f) };
+	glm::vec3 camera_position { glm::vec3(532.0f, 880.f, -2156.f) };
+	glm::vec3 camera_rotation { glm::vec3(0.23f, 3.8f, 0.0f) };
 
 	bool m_wireframe{ false };
 	bool m_msaa{ false };
-	bool m_cullFace{ true };	
+	bool m_cullFace{ true };
+	bool m_shadow_map{ false };
 
 	std::vector<MeshStruct> m_meshVector;
 
