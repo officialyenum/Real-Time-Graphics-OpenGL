@@ -17,6 +17,5 @@ void main(void)
 	varying_position = vec3(model_xform * vec4(vertex_position, 1.0));
 	varying_normals = mat3(transpose(inverse(model_xform))) * vertex_normals;;
 	varying_texcoords = vertex_texcoords;
-
 }
 

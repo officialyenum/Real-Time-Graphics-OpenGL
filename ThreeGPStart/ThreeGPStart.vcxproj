@@ -112,6 +112,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="WildWest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
@@ -144,6 +145,8 @@
     <None Include="Data\Shaders\terrain_fragment_shader.frag" />
     <None Include="Data\Shaders\terrain_vertex_shader.vert" />
     <None Include="Data\Shaders\vertex_shader.vert" />
+    <None Include="Data\Shaders\west_fragment_shader.frag" />
+    <None Include="Data\Shaders\west_terrain_vertex_shader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="External\IMGUI\imgui.natvis" />

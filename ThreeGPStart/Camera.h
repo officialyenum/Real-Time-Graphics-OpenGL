@@ -46,6 +46,8 @@ namespace Helpers
 
 		// Returns the current position of the camera
 		glm::vec3 GetPosition() const { return m_position; }
+		// Returns the current Rotation of the camera
+		glm::vec3 GetRotation() const { return m_rotations; }
 
 		// Returns the forward looking vector
 		glm::vec3 GetLookVector() const;

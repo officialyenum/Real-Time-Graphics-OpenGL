@@ -19,8 +19,8 @@ public:
 	Apple();
 	~Apple();
 
-	void InitGeometry();
-	void RenderApple(GLuint& m_program, const Helpers::Camera& camera);
+	void InitGeometry(const std::string texture);
+	void RenderApple(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position);
 
 	//Render in Scene
 
@@ -47,7 +47,7 @@ inline  Apple::~Apple()
 {
 }
 
-inline void  Apple::InitGeometry()
+inline void Apple::InitGeometry(const std::string texture)
 {
 	std::cout << "---------------------------------" << "\n";
 	Helpers::ModelLoader loader;
@@ -55,7 +55,7 @@ inline void  Apple::InitGeometry()
 
 	// Todo: Load Image Texture;
 	Helpers::ImageLoader imageLoader;
-	imageLoader.Load("Data\\Models\\Apple\\2.jpg");
+	imageLoader.Load(texture);
 
 
 	// Now we can loop through all the mesh in the loaded model:
@@ -160,21 +160,9 @@ inline void  Apple::InitGeometry()
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-
-	// FXAA BUFFER
-
-	glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_mesh.meshTexture, 0);
-
-	GLenum bufs4[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs4);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
 }
 
-inline void  Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera)
+inline void Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position)
 {
 
 
@@ -196,7 +184,7 @@ inline void  Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "combined_xform"), 1, GL_FALSE, glm::value_ptr(combined_xform));
 
 	glm::mat4 model_xform = glm::mat4(1);
-	model_xform = glm::translate(model_xform, glm::vec3(-200.0f, 500.0f, 20.0f));
+	model_xform = glm::translate(model_xform, glm::vec3(position));
 
 	// Send the model matrix to the shader in a uniform
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));

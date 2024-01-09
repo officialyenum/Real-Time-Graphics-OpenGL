@@ -19,8 +19,8 @@ public:
 	Jeep();
 	~Jeep();
 
-	void InitGeometry();
-	void RenderJeep(GLuint& m_program, const Helpers::Camera& camera);
+	void InitGeometry(const std::string texture);
+	void RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position);
 
 	//Render in Scene
 
@@ -44,7 +44,7 @@ inline Jeep::~Jeep()
 {
 }
 
-inline void Jeep::InitGeometry()
+inline void Jeep::InitGeometry(const std::string texture)
 {
 	std::cout << "---------------------------------" << "\n";
 	Helpers::ModelLoader loader;
@@ -52,7 +52,7 @@ inline void Jeep::InitGeometry()
 
 	// Todo: Load Image Texture;
 	Helpers::ImageLoader imageLoader;
-	imageLoader.Load("Data\\Models\\Jeep\\jeep_army.jpg");
+	imageLoader.Load(texture);
 
 	// Now we can loop through all the mesh in the loaded model:
 	for (const Helpers::Mesh& mesh : loader.GetMeshVector())
@@ -170,7 +170,7 @@ inline void Jeep::InitGeometry()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
 }
 
-inline void Jeep::RenderJeep(GLuint &m_program, const Helpers::Camera& camera)
+inline void Jeep::RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position)
 {
 	
 
@@ -192,7 +192,7 @@ inline void Jeep::RenderJeep(GLuint &m_program, const Helpers::Camera& camera)
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "combined_xform"), 1, GL_FALSE, glm::value_ptr(combined_xform));
 
 	glm::mat4 model_xform = glm::mat4(1);
-	model_xform = glm::translate(model_xform, glm::vec3(2.0f, 5.0f, -15.0f));
+	model_xform = glm::translate(model_xform, glm::vec3(position));
 
 
 	// Send the model matrix to the shader in a uniform

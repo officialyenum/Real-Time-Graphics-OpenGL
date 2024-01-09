@@ -199,22 +199,23 @@ inline void Terrain::InitGeometry(int size)
 		(void*)0            // array buffer offset (advanced)
 	);
 
-	glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(
 		1,                  // attribute 0
-		2,                  // size in bytes of each item in the stream
+		3,                  // size in bytes of each item in the stream
 		GL_FLOAT,           // type of the item
 		GL_FALSE,           // normalized or not (advanced)
 		0,                  // stride (advanced)
 		(void*)0            // array buffer offset (advanced)
 	);
 
-	glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, texcoordsVBO);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(
 		2,                  // attribute 0
-		3,                  // size in bytes of each item in the stream
+		2,                  // size in bytes of each item in the stream
 		GL_FLOAT,           // type of the item
 		GL_FALSE,           // normalized or not (advanced)
 		0,                  // stride (advanced)
@@ -229,7 +230,7 @@ inline void Terrain::InitGeometry(int size)
 
 	// Todo: Load Image Texture;
 	Helpers::ImageLoader imageLoader;
-	imageLoader.Load("Data\\Textures\\planks.png");
+	imageLoader.Load("Data\\Textures\\grass11.bmp");
 
 	glGenTextures(1, &m_mesh.meshTexture);
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
@@ -274,14 +275,13 @@ inline void Terrain::RenderTerrain(GLuint& m_program, const Helpers::Camera& cam
 	//glUniform3f(glGetUniformLocation(m_program, "lightPos"), 0.0f, 5000.0f, 0.0f);
 
 
-	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
-	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
-	glUniform1i(glGetUniformLocation(m_program, "sampler_tex"), 0);
 
 	// Bind our VAO and render
 	for (const TerrainStruct mesh : m_meshVector)
 	{
-
+		glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
+		glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
+		glUniform1i(glGetUniformLocation(m_program, "material.diffuse"), 0);
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numElements, GL_UNSIGNED_INT, (void*)0);
 	}

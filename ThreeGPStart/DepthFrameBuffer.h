@@ -44,9 +44,6 @@ inline DepthBuffer::~DepthBuffer()
 
 inline void DepthBuffer::InitGeometry()
 {
-	std::cout << "---------------------------------" << "\n";
-	Helpers::ModelLoader loader;
-	loader.LoadFromFile("Data\\Models\\DepthBuffer\\DepthBuffer.obj");
 
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 

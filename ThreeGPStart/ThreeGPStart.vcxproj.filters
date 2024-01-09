@@ -83,6 +83,9 @@
     <ClInclude Include="DepthFrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WildWest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -169,6 +172,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Data\Shaders\depth_buffer_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\west_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\west_terrain_vertex_shader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
