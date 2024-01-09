@@ -39,7 +39,7 @@ protected:
 
 inline Bot::Bot()
 {
-	botPosition = glm::vec3(-200.0f, 500.0f, 20.0f);
+	botPosition = glm::vec3(10.0f, 500.0f, 20.0f);
 }
 
 inline Bot::~Bot()
@@ -50,11 +50,11 @@ inline void Bot::InitGeometry()
 {
 	std::cout << "---------------------------------" << "\n";
 	Helpers::ModelLoader loader;
-	loader.LoadFromFile("Data\\Models\\Skull\\skull.obj");
+	loader.LoadFromFile("Data\\Models\\Sphere\\sphere.obj");
 
-	// Todo: Load Image Texture;
-	Helpers::ImageLoader imageLoader;
-	imageLoader.Load("Data\\Models\\Skull\\skull.jpg");
+	//// Todo: Load Image Texture;
+	//Helpers::ImageLoader imageLoader;
+	//imageLoader.Load("Data\\Models\\Skull\\skull.jpg");
 
 	// Now we can loop through all the mesh in the loaded model:
 	for (const Helpers::Mesh& mesh : loader.GetMeshVector())
@@ -142,34 +142,23 @@ inline void Bot::InitGeometry()
 
 
 
-	GLint viewportSize[4];
-	glGetIntegerv(GL_VIEWPORT, viewportSize);
+	//GLint viewportSize[4];
+	//glGetIntegerv(GL_VIEWPORT, viewportSize);
 
-	//FXAA Framebuffer + Texture
-	glGenFramebuffers(1, &fxaa_fbo_);
-	glGenTextures(1, &m_mesh.meshTexture);
-	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
+	////FXAA Framebuffer + Texture
+	//glGenFramebuffers(1, &fxaa_fbo_);
+	//glGenTextures(1, &m_mesh.meshTexture);
+	//glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
-	glGenerateMipmap(GL_TEXTURE_2D);
+	////glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
+	//glGenerateMipmap(GL_TEXTURE_2D);
 
-
-	// FXAA BUFFER
-
-	glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_mesh.meshTexture, 0);
-
-	GLenum bufs4[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs4);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
 }
 
 inline void Bot::RenderBot(GLuint& m_program, const Helpers::Camera& camera)
@@ -194,8 +183,7 @@ inline void Bot::RenderBot(GLuint& m_program, const Helpers::Camera& camera)
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "combined_xform"), 1, GL_FALSE, glm::value_ptr(combined_xform));
 
 	glm::mat4 model_xform = glm::mat4(1);
-	model_xform = glm::translate(model_xform, glm::vec3(-200.0f, 500.0f, 20.0f));
-
+	model_xform = glm::translate(model_xform, glm::vec3(200.0f, 500.0f, 20.0f));
 
 	// Send the model matrix to the shader in a uniform
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));

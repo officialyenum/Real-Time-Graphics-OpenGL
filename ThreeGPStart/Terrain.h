@@ -229,10 +229,7 @@ inline void Terrain::InitGeometry(int size)
 
 	// Todo: Load Image Texture;
 	Helpers::ImageLoader imageLoader;
-	imageLoader.Load("Data\\Textures\\grass11.bmp");
-
-	//FXAA Framebuffer + Texture
-	glGenFramebuffers(1, &fxaa_fbo_);
+	imageLoader.Load("Data\\Textures\\planks.png");
 
 	glGenTextures(1, &m_mesh.meshTexture);
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
@@ -273,16 +270,18 @@ inline void Terrain::RenderTerrain(GLuint& m_program, const Helpers::Camera& cam
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));
 
 
-	glUniform4f(glGetUniformLocation(m_program, "lightColor"), 1.0f, 1.0f, 1.0f, 1.0f);
-	glUniform3f(glGetUniformLocation(m_program, "lightPos"), 0.0f, 3000.0f, 0.0f);
+	//glUniform4f(glGetUniformLocation(m_program, "lightColor"), 1.0f, 1.0f, 1.0f, 0.2f);
+	//glUniform3f(glGetUniformLocation(m_program, "lightPos"), 0.0f, 5000.0f, 0.0f);
+
 
 	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
-	glUniform1i(glGetUniformLocation(m_program, "sample_tex"), 0);
+	glUniform1i(glGetUniformLocation(m_program, "sampler_tex"), 0);
 
 	// Bind our VAO and render
 	for (const TerrainStruct mesh : m_meshVector)
 	{
+
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numElements, GL_UNSIGNED_INT, (void*)0);
 	}

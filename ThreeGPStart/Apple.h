@@ -204,7 +204,7 @@ inline void  Apple::RenderApple(GLuint& m_program, const Helpers::Camera& camera
 
 	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshTexture);
-	glUniform1i(glGetUniformLocation(m_program, "sample_tex"), 0);
+	glUniform1i(glGetUniformLocation(m_program, "sampler_tex"), 0);
 
 	// Bind our VAO and render
 

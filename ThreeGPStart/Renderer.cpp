@@ -160,7 +160,34 @@ bool Renderer::CreateProgram()
 			return false;
 	}
 	
+	{
+		// Create a new program (returns a unqiue id)
+		depth_program = glCreateProgram();
 
+		// Load and create vertex and fragment shaders
+		GLuint depth_buffer_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/depth_buffer_vertex_shader.vert") };
+		GLuint depth_buffer_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/depth_buffer_fragment_shader.frag") };
+		if (depth_buffer_vertex_shader == 0 || depth_buffer_fragment_shader == 0)
+			return false;
+
+		// Attach the vertex shader to this program (copies it)
+		glAttachShader(depth_program, depth_buffer_vertex_shader);
+
+		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+		// Not needed if you use (location=0) in the vertex shader itself
+		//glBindAttribLocation(m_program, 0, "vertex_position");
+
+		// Attach the fragment shader (copies it)
+		glAttachShader(depth_program, depth_buffer_fragment_shader);
+
+		// Done with the originals of these as we have made copies
+		glDeleteShader(depth_buffer_vertex_shader);
+		glDeleteShader(depth_buffer_fragment_shader);
+
+		// Link the shaders, checking for errors
+		if (!Helpers::LinkProgramShaders(depth_program))
+			return false;
+	}
 	return true;
 }
 
@@ -174,7 +201,7 @@ bool Renderer::InitialiseGeometry()
 	//Jeep
 	jeepInstance.InitGeometry();
 	//Apple
-	botInstance.InitGeometry();
+	//botInstance.InitGeometry();
 	//Apple
 	appleInstance.InitGeometry();
 
@@ -209,9 +236,9 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 		jeepInstance.RenderJeep(m_program, camera);
 	}
 	//Render Bot;
-	{
+	/*{
 		botInstance.RenderBot(b_program, camera);
-	}
+	}*/
 	//Render Terrain;
 	{
 		terrainInstance.RenderTerrain(l_program, camera);
@@ -220,6 +247,11 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	{
 
 		appleInstance.RenderApple(a_program, camera);
+	}
+	//Render Depth Buffer;
+	{
+
+		depthBufferInstance.RenderDepthBuffer(depth_program, camera);
 	}
 	
 

@@ -92,8 +92,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Apple.h" />
-    <ClInclude Include="Bot.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DepthFrameBuffer.h" />
     <ClInclude Include="ExternalLibraryHeaders.h" />
     <ClInclude Include="External\IMGUI\imconfig.h" />
     <ClInclude Include="External\IMGUI\imgui.h" />
@@ -134,6 +134,8 @@
     <None Include="Data\Shaders\apple_vertex_shader.vert" />
     <None Include="Data\Shaders\bot_fragment_shader.frag" />
     <None Include="Data\Shaders\bot_vertex_shader.vert" />
+    <None Include="Data\Shaders\depth_buffer_fragment_shader.frag" />
+    <None Include="Data\Shaders\depth_buffer_vertex_shader.vert" />
     <None Include="Data\Shaders\fragment_shader.frag" />
     <None Include="Data\Shaders\lighting_fragment_shader.frag" />
     <None Include="Data\Shaders\lighting_vertex_shader.vert" />

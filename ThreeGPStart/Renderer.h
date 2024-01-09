@@ -9,6 +9,7 @@
 #include "Terrain.h"
 #include "Apple.h"
 #include "Bot.h"
+#include "DepthFrameBuffer.h"
 
 
 
@@ -43,6 +44,9 @@ private:
 	GLuint a_program{ 0 };
 	// Apple Program object - to host light shaders
 	GLuint b_program{ 0 };
+	// Apple Program object - to host light shaders
+	GLuint depth_program{ 0 };
+	
 
 	// Vertex Array Object to wrap all render settings
 	GLuint m_terrain_VAO{ 0 };
@@ -56,6 +60,7 @@ private:
 	GLuint fxaa_tex_{ 0 };
 
 	Jeep jeepInstance;
+	DepthBuffer depthBufferInstance;
 	Terrain terrainInstance;
 	Apple appleInstance; 
 	Bot botInstance;
