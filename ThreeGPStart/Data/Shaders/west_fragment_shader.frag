@@ -48,20 +48,6 @@ vec4 direcLight()
 	return (texture(material.diffuse, varying_texcoords) * (diffuse + ambient) + texture(material.specular, varying_texcoords).r * specular) * light.color;
 }
 
-float near = 0.1f;
-float far = 100.0f;
-
-float linearizeDepth(float depth)
-{
-	return (2.0 * near * far) / (far + near - (depth * 2.0 - 1.0) * (far - near));
-}
-
-float logisticDepth(float depth, float steepness = 0.5f, float offset = 5.0f)
-{
-	float zVal = linearizeDepth(depth);
-	return (1 / (1 + exp(-steepness * (zVal - offset))));
-}
-
 void main() {
     // Ambient
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, varying_texcoords));
@@ -84,4 +70,5 @@ void main() {
 	// outputs final color
 //	float depth = logisticDepth(gl_FragCoord.z);
 //	color = direcLight() * (1.0f - depth) + vec4(depth * vec3(0.85f, 0.85f, 0.90f), 1.0f);
+//	color = direcLight();
 }

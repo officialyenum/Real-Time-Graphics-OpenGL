@@ -53,6 +53,9 @@ inline void WildWest::InitGeometry(GLuint& m_program, const std::string& obj, co
 	Helpers::ModelLoader loader;
 	loader.LoadFromFile(obj);
 
+
+	std::cout << loader.GetMeshVector()[0].vertices[0][0] << "\n";
+
 	// Todo: Load Image Texture;
 	Helpers::ImageLoader imageLoader;
 	imageLoader.Load(texture);

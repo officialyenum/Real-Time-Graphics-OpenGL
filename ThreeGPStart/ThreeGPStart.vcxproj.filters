@@ -92,6 +92,12 @@
     <ClInclude Include="ShadowMapBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -196,6 +202,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Data\Shaders\shadow_buffer_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\frame_buffer_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\frame_buffer_vertex_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\object_fragment_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\object_vertex_shader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

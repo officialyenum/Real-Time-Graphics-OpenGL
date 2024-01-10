@@ -34,11 +34,12 @@ void Renderer::DefineGUI()
 
 	ImGui::Checkbox("Wireframe", &m_wireframe);	// A checkbox linked to a member variable
 
-	ImGui::Checkbox("MSAA", &m_msaa);	// A checkbox linked to a member variable
+	ImGui::Checkbox("MSAA X8", &m_msaa);	// A checkbox linked to a member variable
 	ImGui::Checkbox("Shadow Map", &m_shadow_map);	// A checkbox linked to a member variable
 	ImGui::Checkbox("Cull Face", &m_cullFace);	// A checkbox linked to a member variable
 
 	ImGui::Checkbox("Depth Test", &m_depth);	// A checkbox linked to a member variable
+	ImGui::Checkbox("Single/Multi Light", &m_single_light);	// A checkbox linked to a member variable
 	ImGui::Checkbox("Counter Clockwise", &m_counter_clockwise);	// A checkbox linked to a member variable
 
 
@@ -48,10 +49,16 @@ void Renderer::DefineGUI()
 	ImGui::InputFloat3("Army Jeep", glm::value_ptr(army_jeep_position));
 	ImGui::InputFloat3("Terrain", glm::value_ptr(terrain_position));
 	ImGui::InputFloat3("Wild West", glm::value_ptr(wild_west_position));
+	ImGui::InputFloat3("Cave", glm::value_ptr(cave_position));
+	ImGui::InputFloat3("Cargo", glm::value_ptr(cargo_position));
 	ImGui::InputFloat3("Apple", glm::value_ptr(apple_position));
 	ImGui::InputFloat3("Camera Position", glm::value_ptr(camera_position));
 	ImGui::InputFloat3("Camera Rotation", glm::value_ptr(camera_rotation));
-	ImGui::InputFloat3("Light Source Position", glm::value_ptr(light_source_position));
+	ImGui::InputFloat3("Scene Light Source Position", glm::value_ptr(light_source_position));
+	ImGui::InputFloat3("Point Light 1 Position", glm::value_ptr(point_light_source_position[0]));
+	ImGui::InputFloat3("Point Light 2 Position", glm::value_ptr(point_light_source_position[1]));
+	ImGui::InputFloat3("Point Light 3 Position", glm::value_ptr(point_light_source_position[2]));
+	ImGui::InputFloat3("Point Light 4 Position", glm::value_ptr(point_light_source_position[3]));
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
@@ -146,6 +153,64 @@ bool Renderer::CreateProgram()
 		// Link the shaders, checking for errors
 		if (!Helpers::LinkProgramShaders(terrain_program))
 			return false;
+	}
+
+	{
+		//create a Frame Buffer program
+		obj_program = glCreateProgram();
+
+		// Load and create vertex and fragment shaders
+		GLuint obj_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/object_vertex_shader.vert") };
+		GLuint obj_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/object_fragment_shader.frag") };
+		if (obj_vertex_shader == 0 || obj_fragment_shader == 0)
+			return false;
+
+		// Attach the vertex shader to this program (copies it)
+		glAttachShader(obj_program, obj_vertex_shader);
+
+		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+		// Not needed if you use (location=0) in the vertex shader itself
+		//glBindAttribLocation(m_program, 0, "vertex_position");
+
+		// Attach the fragment shader (copies it)
+		glAttachShader(obj_program, obj_fragment_shader);
+
+		// Done with the originals of these as we have made copies
+		glDeleteShader(obj_vertex_shader);
+		glDeleteShader(obj_fragment_shader);
+
+		// Link the shaders, checking for errors
+		if (!Helpers::LinkProgramShaders(obj_program))
+			return false;
+	}
+
+	{
+		//create a Frame Buffer program
+		frame_buffer_program = glCreateProgram();
+
+	// Load and create vertex and fragment shaders
+	GLuint frame_buffer_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/frame_buffer_vertex_shader.vert") };
+	GLuint frame_buffer_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/frame_buffer_fragment_shader.frag") };
+	if (frame_buffer_vertex_shader == 0 || frame_buffer_fragment_shader == 0)
+		return false;
+
+	// Attach the vertex shader to this program (copies it)
+	glAttachShader(frame_buffer_program, frame_buffer_vertex_shader);
+
+	// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
+	// Not needed if you use (location=0) in the vertex shader itself
+	//glBindAttribLocation(m_program, 0, "vertex_position");
+
+	// Attach the fragment shader (copies it)
+	glAttachShader(frame_buffer_program, frame_buffer_fragment_shader);
+
+	// Done with the originals of these as we have made copies
+	glDeleteShader(frame_buffer_vertex_shader);
+	glDeleteShader(frame_buffer_fragment_shader);
+
+	// Link the shaders, checking for errors
+	if (!Helpers::LinkProgramShaders(frame_buffer_program))
+		return false;
 	}
 
 	{
@@ -274,20 +339,34 @@ bool Renderer::InitialiseGeometry()
 	if (!CreateProgram())
 		return false;
 	//msaa
-	msaaFrameBuffer.InitGeometry(msaa_program);
+	//msaaFrameBuffer.InitGeometry(msaa_program);
 	//shadow map
-	//shadowMapBufferInstance.InitGeometry(shadow_program);
+	shadowMapBufferInstance.InitGeometry(shadow_program, depth_program);
 	//Lights
 	lightSource.InitGeometry();
-	//Jeep
+	lightSource.InitPointGeometry();
+	//Point Light Source
+	/*for (size_t i = 0; i < m_pointLightObjects.size(); ++i) {
+		m_pointLightObjects[i].InitGeometry();
+	}*/
+
+
+	//Object
 	armyJeepInstance.InitGeometry(west_program, "Data\\Models\\Jeep\\jeep.obj", "Data\\Models\\Jeep\\jeep_army.jpg", "");
 	redJeepInstance.InitGeometry(west_program, "Data\\Models\\Jeep\\jeep.obj", "Data\\Models\\Jeep\\jeep_rood.jpg", "nullptr");
-	//Bot
-	//botInstance.InitGeometry();
-	//Apple
 	appleInstance.InitGeometry(west_program, "Data\\Models\\Apple\\apple.obj", "Data\\Models\\Apple\\2.jpg", "");
-	//WildWest
+	caveInstance.InitGeometry(west_program, "Data\\Models\\Cave\\cave.obj", "Data\\Models\\Cave\\diffuse.png", "Data\\Models\\Cave\\specular.png");
+	cargoInstance.InitGeometry(west_program, "Data\\Models\\Bench\\bench.obj", "Data\\Models\\Bench\\diffuse.png", "Data\\Models\\Bench\\specular.png");
 	wildWestInstance.InitGeometry(west_program, "Data\\Models\\WildWest\\WildWest.obj", "Data\\Models\\WildWest\\base.png", "Data\\Models\\WildWest\\specular.png");
+	
+	// West Program
+	w_armyJeepInstance.InitGeometry(west_program, "Data\\Models\\Jeep\\jeep.obj", "Data\\Models\\Jeep\\jeep_army.jpg", "");
+	w_redJeepInstance.InitGeometry(west_program, "Data\\Models\\Jeep\\jeep.obj", "Data\\Models\\Jeep\\jeep_rood.jpg", "nullptr");
+	w_appleInstance.InitGeometry(west_program, "Data\\Models\\Apple\\apple.obj", "Data\\Models\\Apple\\2.jpg", "");
+	w_caveInstance.InitGeometry(west_program, "Data\\Models\\Cave\\cave.obj", "Data\\Models\\Cave\\diffuse.png", "Data\\Models\\Cave\\specular.png");
+	w_cargoInstance.InitGeometry(west_program, "Data\\Models\\Bench\\bench.obj", "Data\\Models\\Bench\\diffuse.png", "Data\\Models\\Bench\\specular.png");
+	w_wildWestInstance.InitGeometry(west_program, "Data\\Models\\WildWest\\WildWest.obj", "Data\\Models\\WildWest\\base.png", "Data\\Models\\WildWest\\specular.png");
+
 	//Terrain
 	terrainInstance.InitGeometry(10000);
 
@@ -309,6 +388,7 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	
 	if (m_cullFace) {
 		// Enables Cull Facing
 		glEnable(GL_CULL_FACE);
@@ -346,80 +426,96 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	// Compute camera view matrix and combine with projection matrix for passing to shader
 	glm::mat4 view_xform = glm::lookAt(camera.GetPosition(), camera.GetPosition() + camera.GetLookVector(), camera.GetUpVector());
 	glm::mat4 combined_xform = projection_xform * view_xform;
+	
+
 	if (m_shadow_map)
 	{
-		lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
-		depthBufferInstance.RenderDepthBuffer(depth_program, camera);
-		shadowMapBufferInstance.RenderShadowMapBuffer(shadow_program, glm::vec3(lightSource.GetPosition()));
+		{
+			shadowMapBufferInstance.RenderShadowMapBuffer(shadow_program, light_source_position);
+			// Render Light
+			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			//lightSource.RenderPointLight(light_source_program, camera, glm::mat4(combined_xform));
+
+			/*for (size_t i = 0; i < m_pointLightObjects.size(); ++i) {
+				m_pointLightObjects[i].RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(m_pointLightPositions[i]));
+			}*/
+
+			// Render Terrain
+			terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
 
 
-		// first render pass: mirror texture.
-		// bind to framebuffer and draw to color texture as we normally 
-		// would, but with the view camera reversed.
-		// bind to framebuffer and draw scene as we normally would to color texture 
-		// ------------------------------------------------------------------------
-		// 2. render scene as normal using the generated depth/shadow map  
-		// --------------------------------------------------------------
-		glUseProgram(shadow_program);
-		glUniformMatrix4fv(glGetUniformLocation(shadow_program, "view"), 1, GL_FALSE, glm::value_ptr(view_xform));
-		glUniformMatrix4fv(glGetUniformLocation(shadow_program, "projection"), 1, GL_FALSE, glm::value_ptr(projection_xform));
-		glUniform3f(glGetUniformLocation(shadow_program, "lightPos"), lightSource.GetPosition().x, lightSource.GetPosition().y, lightSource.GetPosition().z);
-		glUniform3f(glGetUniformLocation(shadow_program, "viewPos"), camera.GetLookVector().x, camera.GetLookVector().y, camera.GetLookVector().z);
-		glUniformMatrix4fv(glGetUniformLocation(shadow_program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(combined_xform));
+			if (m_single_light) {
+				w_armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_caveInstance.RenderWildWest(west_program, camera, glm::vec3(cave_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_cargoInstance.RenderWildWest(west_program, camera, glm::vec3(cargo_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, shadowMapBufferInstance.GetShadowTexture());
+			}
+			else {
+				// Render Objects
+				armyJeepInstance.RenderObject(obj_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				redJeepInstance.RenderObject(obj_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				appleInstance.RenderObject(obj_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				wildWestInstance.RenderObject(obj_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				caveInstance.RenderObject(west_program, camera, glm::vec3(cave_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				cargoInstance.RenderObject(west_program, camera, glm::vec3(cargo_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			}
 
-		msaaFrameBuffer.RenderMSAAFrameBuffer(msaa_program, camera, glm::mat4(combined_xform));
-		lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
-		armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		depthBufferInstance.RenderDepthBuffer(depth_program, camera);
+			shadowMapBufferInstance.RenderShadowMapBufferAfter(depth_program);
+
+			if (m_single_light) {
+				w_armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_caveInstance.RenderWildWest(west_program, camera, glm::vec3(cave_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+				w_cargoInstance.RenderWildWest(west_program, camera, glm::vec3(cargo_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+
+			}
+			else {
+				// Render Objects
+				armyJeepInstance.RenderObject(obj_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				redJeepInstance.RenderObject(obj_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				appleInstance.RenderObject(obj_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				wildWestInstance.RenderObject(obj_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				caveInstance.RenderObject(west_program, camera, glm::vec3(cave_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+				cargoInstance.RenderObject(west_program, camera, glm::vec3(cargo_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			}
+
+			//depthBufferInstance.RenderDepthBuffer(depth_program, camera);
+		}
 	}
 	else {
-		if (m_msaa)
-		{
-			// first render pass: mirror texture.
-			// bind to framebuffer and draw to color texture as we normally 
-			// would, but with the view camera reversed.
-			// bind to framebuffer and draw scene as we normally would to color texture 
-			// ------------------------------------------------------------------------
-			msaaFrameBuffer.RenderMSAAFrameBuffer(msaa_program, camera, glm::mat4(combined_xform));
-			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
-			armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			depthBufferInstance.RenderDepthBuffer(depth_program, camera);
-
-			// second render pass: draw as normal
-			// ----------------------------------
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
 		// Render Light
-		{
-			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
-			armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			depthBufferInstance.RenderDepthBuffer(depth_program, camera);
+		lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+		//lightSource.RenderPointLight(light_source_program, camera, glm::mat4(combined_xform));
+
+		/*for (size_t i = 0; i < m_pointLightObjects.size(); ++i) {
+			m_pointLightObjects[i].RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(m_pointLightPositions[i]));
+		}*/
+
+		// Render Terrain
+		terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+
+		if (m_single_light) {
+			w_armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			w_redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			w_appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			w_wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			w_caveInstance.RenderWildWest(west_program, camera, glm::vec3(cave_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			w_cargoInstance.RenderWildWest(west_program, camera, glm::vec3(cargo_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+
 		}
-		if (m_msaa)
-		{
-			msaaFrameBuffer.RenderMSAAFrameBufferAfter(msaa_program);
+		else {
+			// Render Objects
+			armyJeepInstance.RenderObject(obj_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			redJeepInstance.RenderObject(obj_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			appleInstance.RenderObject(obj_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			wildWestInstance.RenderObject(obj_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			caveInstance.RenderObject(west_program, camera, glm::vec3(cave_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
+			cargoInstance.RenderObject(west_program, camera, glm::vec3(cargo_position), glm::mat4(combined_xform), glm::vec3(light_source_position), point_light_source_position);
 		}
 	}
-	
-	
-	
-
 }
