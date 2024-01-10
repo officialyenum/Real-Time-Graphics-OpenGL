@@ -72,15 +72,15 @@ private:
 	GLuint fxaa_tex_{ 0 };
 
 	//Jeep
-	Jeep armyJeepInstance;
+	WildWest armyJeepInstance;
 	glm::vec3 army_jeep_position { glm::vec3(-600.f, 0.f, -200.f) };
-	Jeep redJeepInstance;
+	WildWest redJeepInstance;
 	glm::vec3 red_jeep_position { glm::vec3(-800.f, 0.f, -800.f) };
 
 	
 	Terrain terrainInstance;
 	glm::vec3 terrain_position { glm::vec3(100.f, 0.f, 500.f) };
-	Apple appleInstance;
+	WildWest appleInstance;
 	glm::vec3 apple_position { glm::vec3(0.f, 240.f, 300.f) };
 	Bot botInstance;
 
@@ -97,12 +97,16 @@ private:
 	ShadowMapBuffer shadowMapBufferInstance;
 
 	//Camera
-	glm::vec3 camera_position { glm::vec3(532.0f, 880.f, -2156.f) };
-	glm::vec3 camera_rotation { glm::vec3(0.23f, 3.8f, 0.0f) };
+	glm::vec3 camera_position { glm::vec3(37.811f, 310.902f, 255.142) };
+	glm::vec3 camera_rotation { glm::vec3(-0.010f, 3.727f, 0.0f) };
+	/*glm::vec3 camera_position { glm::vec3(532.0f, 880.f, -2156.f) };
+	glm::vec3 camera_rotation { glm::vec3(0.23f, 3.8f, 0.0f) };*/
 
 	bool m_wireframe{ false };
 	bool m_msaa{ false };
 	bool m_cullFace{ true };
+	bool m_depth{ true };
+	bool m_counter_clockwise{ false };
 	bool m_shadow_map{ false };
 
 	std::vector<MeshStruct> m_meshVector;

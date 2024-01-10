@@ -94,14 +94,15 @@ namespace Helpers
 		glfwWindowHint(GLFW_ALPHA_BITS, 0);
 		glfwWindowHint(GLFW_DEPTH_BITS, 24);
 		glfwWindowHint(GLFW_STENCIL_BITS, 8);
-		glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing, could raise e.g. to 8
+		glfwWindowHint(GLFW_SAMPLES, 8); // 4x antialiasing, could raise e.g. to 8
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // We want OpenGL 4.6 minimum
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		const char* glsl_version = "#version 460";	// For imgui
 
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
-		//glEnable(GL_MULTISAMPLE);
+		glEnable(GL_MULTISAMPLE);
+
 
 // Turn on debug mode
 #ifdef _DEBUG

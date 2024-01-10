@@ -36,6 +36,12 @@ void Renderer::DefineGUI()
 
 	ImGui::Checkbox("MSAA", &m_msaa);	// A checkbox linked to a member variable
 	ImGui::Checkbox("Shadow Map", &m_shadow_map);	// A checkbox linked to a member variable
+	ImGui::Checkbox("Cull Face", &m_cullFace);	// A checkbox linked to a member variable
+
+	ImGui::Checkbox("Depth Test", &m_depth);	// A checkbox linked to a member variable
+	ImGui::Checkbox("Counter Clockwise", &m_counter_clockwise);	// A checkbox linked to a member variable
+
+
 
 	// Alternatively, you can use ImGui::InputFloat3 for direct input
 	ImGui::InputFloat3("Red Jeep", glm::value_ptr(red_jeep_position));
@@ -199,34 +205,6 @@ bool Renderer::CreateProgram()
 		if (!Helpers::LinkProgramShaders(shadow_program))
 			return false;
 	}
-	{
-		//create a Shadow program
-		depth_program = glCreateProgram();
-
-		// Load and create vertex and fragment shaders
-		GLuint depth_buffer_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/depth_buffer_vertex_shader.vert") };
-		GLuint depth_buffer_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/depth_buffer_fragment_shader.frag") };
-		if (depth_buffer_vertex_shader == 0 || depth_buffer_fragment_shader == 0)
-			return false;
-
-		// Attach the vertex shader to this program (copies it)
-		glAttachShader(depth_program, depth_buffer_vertex_shader);
-
-		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
-		// Not needed if you use (location=0) in the vertex shader itself
-		//glBindAttribLocation(m_program, 0, "vertex_position");
-
-		// Attach the fragment shader (copies it)
-		glAttachShader(depth_program, depth_buffer_fragment_shader);
-
-		// Done with the originals of these as we have made copies
-		glDeleteShader(depth_buffer_vertex_shader);
-		glDeleteShader(depth_buffer_fragment_shader);
-
-		// Link the shaders, checking for errors
-		if (!Helpers::LinkProgramShaders(depth_program))
-			return false;
-	}
 
 	{
 		west_program = glCreateProgram();
@@ -256,63 +234,7 @@ bool Renderer::CreateProgram()
 			return false;
 	}
 
-	{
-		// Create a new program (returns a unqiue id)
-		apple_program = glCreateProgram();
 
-		// Load and create vertex and fragment shaders
-		GLuint a_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/apple_vertex_shader.vert") };
-		GLuint a_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/apple_fragment_shader.frag") };
-		if (a_vertex_shader == 0 || a_fragment_shader == 0)
-			return false;
-
-		// Attach the vertex shader to this program (copies it)
-		glAttachShader(apple_program, a_vertex_shader);
-
-		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
-		// Not needed if you use (location=0) in the vertex shader itself
-		//glBindAttribLocation(m_program, 0, "vertex_position");
-
-		// Attach the fragment shader (copies it)
-		glAttachShader(apple_program, a_fragment_shader);
-
-		// Done with the originals of these as we have made copies
-		glDeleteShader(a_vertex_shader);
-		glDeleteShader(a_fragment_shader);
-
-		// Link the shaders, checking for errors
-		if (!Helpers::LinkProgramShaders(apple_program))
-			return false;
-	}
-
-	{
-		// Create a new program (returns a unqiue id)
-		b_program = glCreateProgram();
-
-		// Load and create vertex and fragment shaders
-		GLuint b_vertex_shader{ Helpers::LoadAndCompileShader(GL_VERTEX_SHADER, "Data/Shaders/bot_vertex_shader.vert") };
-		GLuint b_fragment_shader{ Helpers::LoadAndCompileShader(GL_FRAGMENT_SHADER, "Data/Shaders/bot_fragment_shader.frag") };
-		if (b_vertex_shader == 0 || b_fragment_shader == 0)
-			return false;
-
-		// Attach the vertex shader to this program (copies it)
-		glAttachShader(b_program, b_vertex_shader);
-
-		// The attibute location 0 maps to the input stream "vertex_position" in the vertex shader
-		// Not needed if you use (location=0) in the vertex shader itself
-		//glBindAttribLocation(m_program, 0, "vertex_position");
-
-		// Attach the fragment shader (copies it)
-		glAttachShader(b_program, b_fragment_shader);
-
-		// Done with the originals of these as we have made copies
-		glDeleteShader(b_vertex_shader);
-		glDeleteShader(b_fragment_shader);
-
-		// Link the shaders, checking for errors
-		if (!Helpers::LinkProgramShaders(b_program))
-			return false;
-	}
 	
 	{
 		// Create a new program (returns a unqiue id)
@@ -358,14 +280,14 @@ bool Renderer::InitialiseGeometry()
 	//Lights
 	lightSource.InitGeometry();
 	//Jeep
-	armyJeepInstance.InitGeometry("Data\\Models\\Jeep\\jeep_army.jpg");
-	redJeepInstance.InitGeometry("Data\\Models\\Jeep\\jeep_rood.jpg");
+	armyJeepInstance.InitGeometry(west_program, "Data\\Models\\Jeep\\jeep.obj", "Data\\Models\\Jeep\\jeep_army.jpg", "");
+	redJeepInstance.InitGeometry(west_program, "Data\\Models\\Jeep\\jeep.obj", "Data\\Models\\Jeep\\jeep_rood.jpg", "nullptr");
 	//Bot
 	//botInstance.InitGeometry();
 	//Apple
-	appleInstance.InitGeometry("Data\\Models\\Apple\\2.jpg");
+	appleInstance.InitGeometry(west_program, "Data\\Models\\Apple\\apple.obj", "Data\\Models\\Apple\\2.jpg", "");
 	//WildWest
-	wildWestInstance.InitGeometry(west_program, "Data\\Models\\WildWest\\base.png");
+	wildWestInstance.InitGeometry(west_program, "Data\\Models\\WildWest\\WildWest.obj", "Data\\Models\\WildWest\\base.png", "Data\\Models\\WildWest\\specular.png");
 	//Terrain
 	terrainInstance.InitGeometry(10000);
 
@@ -377,15 +299,35 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 {
 	//glBindFramebuffer(GL_FRAMEBUFFER, fxaa_fbo_);
 
-	// Configure pipeline settings
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+
+	
+	// Uses counter clock-wise standard
 
 	// Wireframe mode controlled by ImGui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	if (m_cullFace) {
+		// Enables Cull Facing
+		glEnable(GL_CULL_FACE);
+		// Keeps front faces
+		glCullFace(GL_FRONT);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+	}
+	if (m_depth)
+		// Enables the Depth Buffer
+		glEnable(GL_DEPTH_TEST);
+	else
+		glDisable(GL_DEPTH_TEST);
+
+	if (m_counter_clockwise)
+		glFrontFace(GL_CCW);
+	else
+		glFrontFace(GL_CW);
 
 	camera_position = { glm::vec3( camera.GetPosition()) };
 	camera_rotation = { glm::vec3(camera.GetRotation()) };
@@ -406,8 +348,7 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 	glm::mat4 combined_xform = projection_xform * view_xform;
 	if (m_shadow_map)
 	{
-
-		lightSource.RenderLight(m_program, camera, glm::mat4(combined_xform));
+		lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
 		depthBufferInstance.RenderDepthBuffer(depth_program, camera);
 		shadowMapBufferInstance.RenderShadowMapBuffer(shadow_program, glm::vec3(lightSource.GetPosition()));
 
@@ -430,11 +371,11 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 		glBindTexture(GL_TEXTURE_2D, shadowMapBufferInstance.GetShadowTexture());
 
 		msaaFrameBuffer.RenderMSAAFrameBuffer(msaa_program, camera, glm::mat4(combined_xform));
-		lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform));
-		armyJeepInstance.RenderJeep(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		redJeepInstance.RenderJeep(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+		lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
+		armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+		redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 		terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-		appleInstance.RenderApple(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+		appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 		wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 		depthBufferInstance.RenderDepthBuffer(depth_program, camera);
 	}
@@ -447,11 +388,11 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 			// bind to framebuffer and draw scene as we normally would to color texture 
 			// ------------------------------------------------------------------------
 			msaaFrameBuffer.RenderMSAAFrameBuffer(msaa_program, camera, glm::mat4(combined_xform));
-			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform));
-			armyJeepInstance.RenderJeep(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			redJeepInstance.RenderJeep(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
+			armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 			terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			appleInstance.RenderApple(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 			wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 			depthBufferInstance.RenderDepthBuffer(depth_program, camera);
 
@@ -464,11 +405,11 @@ void Renderer::Render(const Helpers::Camera& camera, float deltaTime)
 		}
 		// Render Light
 		{
-			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform));
-			armyJeepInstance.RenderJeep(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			redJeepInstance.RenderJeep(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			lightSource.RenderLight(light_source_program, camera, glm::mat4(combined_xform), glm::vec3(light_source_position));
+			armyJeepInstance.RenderWildWest(west_program, camera, glm::vec3(army_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			redJeepInstance.RenderWildWest(west_program, camera, glm::vec3(red_jeep_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 			terrainInstance.RenderTerrain(terrain_program, camera, glm::vec3(terrain_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
-			appleInstance.RenderApple(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
+			appleInstance.RenderWildWest(west_program, camera, glm::vec3(apple_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 			wildWestInstance.RenderWildWest(west_program, camera, glm::vec3(wild_west_position), glm::mat4(combined_xform), glm::vec3(light_source_position));
 			depthBufferInstance.RenderDepthBuffer(depth_program, camera);
 		}

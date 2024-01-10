@@ -21,8 +21,8 @@ public:
 	WildWest();
 	~WildWest();
 
-	void InitGeometry(GLuint& m_program, const std::string texture);
-	void RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos);
+	void InitGeometry(GLuint& m_program, const std::string& obj, const std::string& texture, const std::string& specularTexture);
+	void RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3& position, glm::mat4& combined_xform, glm::vec3& lightPos);
 
 	//Render in Scene
 
@@ -47,18 +47,20 @@ inline  WildWest::~WildWest()
 {
 }
 
-inline void WildWest::InitGeometry(GLuint& m_program, const std::string texture)
+inline void WildWest::InitGeometry(GLuint& m_program, const std::string& obj, const std::string& texture, const std::string& specularTexture)
 {
 	std::cout << "---------------------------------" << "\n";
 	Helpers::ModelLoader loader;
-	loader.LoadFromFile("Data\\Models\\WildWest\\WildWest.obj");
+	loader.LoadFromFile(obj);
 
 	// Todo: Load Image Texture;
 	Helpers::ImageLoader imageLoader;
 	imageLoader.Load(texture);
 
 	Helpers::ImageLoader specularLoader;
-	specularLoader.Load("Data\\Models\\WildWest\\specular.png");
+	specularLoader.Load(specularTexture);
+	
+	
 	
 
 
@@ -150,7 +152,7 @@ inline void WildWest::InitGeometry(GLuint& m_program, const std::string texture)
 
 	GLint viewportSize[4];
 	glGetIntegerv(GL_VIEWPORT, viewportSize);
-
+	// base
 	glGenTextures(1, &m_mesh.meshDiffuseTexture);
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshDiffuseTexture);
 
@@ -163,6 +165,8 @@ inline void WildWest::InitGeometry(GLuint& m_program, const std::string texture)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+
+
 	//specular
 	glGenTextures(1, &m_mesh.meshSpecularTexture);
 	glBindTexture(GL_TEXTURE_2D, m_mesh.meshSpecularTexture);
@@ -173,8 +177,10 @@ inline void WildWest::InitGeometry(GLuint& m_program, const std::string texture)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, viewportSize[2], viewportSize[3], 0, GL_RGB, GL_FLOAT, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageLoader.Width(), imageLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageLoader.GetData());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, specularLoader.Width(), specularLoader.Height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, specularLoader.GetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
+	
+	
 
 
 	// Set texture units
@@ -184,12 +190,14 @@ inline void WildWest::InitGeometry(GLuint& m_program, const std::string texture)
 }
 
 
-inline void WildWest::RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos)
+inline void WildWest::RenderWildWest(GLuint& m_program, const Helpers::Camera& camera, glm::vec3& position, glm::mat4& combined_xform, glm::vec3& lightPos)
 {
 
+	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glUseProgram(m_program);
 	glUniform3f(glGetUniformLocation(m_program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
+	glUniform4f(glGetUniformLocation(m_program, "light.color"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(m_program, "viewPos"), camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
 
@@ -200,10 +208,6 @@ inline void WildWest::RenderWildWest(GLuint& m_program, const Helpers::Camera& c
 
 	// Set material properties
 	glUniform1f(glGetUniformLocation(m_program, "material.shininess"), 32.0f);
-
-
-	// Use our program. Doing this enables the shaders we attached previously.
-	glUseProgram(m_program);
 
 	// Send the combined matrix to the shader in a uniform
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "combined_xform"), 1, GL_FALSE, glm::value_ptr(combined_xform));

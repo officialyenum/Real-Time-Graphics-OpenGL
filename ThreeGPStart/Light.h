@@ -23,10 +23,11 @@ public:
 
 	void InitGeometry();
 
-	void RenderLight(GLuint& m_program, const Helpers::Camera& camera, glm::mat4 combined_xform);
+	void RenderLight(GLuint& m_program, const Helpers::Camera& camera, glm::mat4 combined_xform, glm::vec3& newlightPos);
 
 
 	glm::vec3 GetPosition() { return lightPos; };
+	glm::vec3 SetPosition(glm::vec3 lightPos);
 
 	//Render in Scene
 
@@ -119,13 +120,13 @@ inline void Light::InitGeometry()
 
 }
 
-inline void Light::RenderLight(GLuint& m_program, const Helpers::Camera& camera, glm::mat4 combined_xform)
+inline void Light::RenderLight(GLuint& m_program, const Helpers::Camera& camera, glm::mat4 combined_xform, glm::vec3& newlightPos)
 {
 	// Use our program. Doing this enables the shaders we attached previously.
 	// set shader program // Light
 	glUseProgram(m_program);
 
-	glUniform3f(glGetUniformLocation(m_program, "objectColor"), 1.0f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(m_program, "objectColor"), 1.0f, 1.0f, 1.0f);
 	glUniform3f(glGetUniformLocation(m_program, "lightColor"), 1.0f, 1.0f, 1.0f);
 
 	// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
@@ -135,8 +136,8 @@ inline void Light::RenderLight(GLuint& m_program, const Helpers::Camera& camera,
 
 	// Send the model matrix to the shader in a uniform
 	glm::mat4 model_xform = glm::mat4(1);
-	model_xform = glm::translate(model_xform, glm::vec3(lightPos.x, lightPos.y, lightPos.z));
-	model_xform = glm::scale(model_xform, glm::vec3(0.2f));
+	model_xform = glm::translate(model_xform, glm::vec3(newlightPos.x, newlightPos.y, newlightPos.z));
+	model_xform = glm::scale(model_xform, glm::vec3(20.0f));
 	glUniformMatrix4fv(glGetUniformLocation(m_program, "model_xform"), 1, GL_FALSE, glm::value_ptr(model_xform));
 
 
@@ -146,4 +147,10 @@ inline void Light::RenderLight(GLuint& m_program, const Helpers::Camera& camera,
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 
+}
+
+inline glm::vec3 Light::SetPosition(glm::vec3 newlightPos)
+{
+	lightPos = glm::vec3(newlightPos);
+	return lightPos;
 }

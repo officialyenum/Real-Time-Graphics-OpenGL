@@ -19,7 +19,7 @@ public:
 	Jeep();
 	~Jeep();
 
-	void InitGeometry(const std::string texture);
+	void InitGeometry(const std::string obj, const std::string texture);
 	void RenderJeep(GLuint& m_program, const Helpers::Camera& camera, glm::vec3 position, glm::mat4 combined_xform, glm::vec3& lightPos);
 
 	//Render in Scene
@@ -44,7 +44,7 @@ inline Jeep::~Jeep()
 {
 }
 
-inline void Jeep::InitGeometry(const std::string texture)
+inline void Jeep::InitGeometry(const std::string obj, const std::string texture)
 {
 	std::cout << "---------------------------------" << "\n";
 	Helpers::ModelLoader loader;
